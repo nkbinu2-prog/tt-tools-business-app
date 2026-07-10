@@ -1,0 +1,1567 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #eef5ff;
+  color: #111827;
+  font-family: "Poppins", "Noto Sans Malayalam", Arial, sans-serif;
+}
+
+button,
+input {
+  font-family: "Poppins", "Noto Sans Malayalam", Arial, sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 10px;
+  background: #eef5ff;
+}
+
+.appLayout {
+  width: 100%;
+  min-height: calc(100vh - 20px);
+  display: grid;
+  grid-template-columns: minmax(0, 75%) minmax(260px, 25%);
+  gap: 10px;
+}
+
+.leftPanel {
+  min-width: 0;
+}
+
+.customerBox {
+  background: white;
+  border: 1px solid #d7e3f3;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 235px 1fr;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+}
+
+.customerBox label {
+  color: #0047bd;
+  font-size: 17px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.customerBox input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+}
+
+.customerBox input:focus {
+  border-color: #0057ff;
+  box-shadow: 0 0 0 2px rgba(0, 87, 255, 0.12);
+}
+
+.sheetWrap {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #d9e2ef;
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+.sheetScroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.rentTable {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: linear-gradient(180deg, #0057ff, #003da9);
+  color: white;
+  border: 1px solid #4d86ff;
+  padding: 10px 6px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.14;
+  letter-spacing: -0.3px;
+}
+
+td {
+  border: 1px solid #e1e7ef;
+  padding: 6px;
+  height: 52px;
+  text-align: center;
+  vertical-align: middle;
+  background: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.noCol,
+.noCell {
+  width: 44px;
+}
+
+.toolCol,
+.toolCell {
+  width: 210px;
+}
+
+.qtyCol {
+  width: 72px;
+}
+
+.rentCol {
+  width: 82px;
+}
+
+.sundayCol {
+  width: 88px;
+}
+
+.dateCol {
+  width: 130px;
+}
+
+.dayCol {
+  width: 70px;
+}
+
+.amountCol {
+  width: 96px;
+}
+
+.rowActionsCol,
+.rowActionsCell {
+  width: 92px;
+}
+
+/* Copy and drag controls */
+.rowActionsCell {
+  padding: 4px;
+  white-space: nowrap;
+}
+
+.copyRowBtn,
+.dragHandle {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #bcd3f7;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #0057ff;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.dragHandle {
+  margin-right: 5px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.copyRowBtn {
+  border-color: #f5b942;
+  background: #fff8e6;
+  color: #d98b00;
+}
+
+.copyRowBtn svg,
+.dragHandle svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.copyRowBtn:hover,
+.dragHandle:hover {
+  transform: translateY(-1px);
+}
+
+.copyRowBtn:active {
+  transform: scale(0.94);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+  border-color: #0057ff;
+  background: #dbeafe;
+}
+
+.draggingRow td {
+  background: #eaf2ff !important;
+  box-shadow: inset 0 0 0 2px #6f9fff;
+}
+
+.draggingRow input {
+  background: #ffffff;
+}
+
+.dragOverRow td {
+  box-shadow: inset 0 4px 0 #0057ff;
+}
+
+.noCol,
+.noCell,
+.rowActionsCol,
+.rowActionsCell,
+.toolCol,
+.toolCell {
+  position: sticky;
+  z-index: 6;
+}
+
+.noCol,
+.noCell {
+  left: 0;
+}
+
+.rowActionsCol,
+.rowActionsCell {
+  left: 44px;
+}
+
+.toolCol,
+.toolCell {
+  left: 136px;
+}
+
+.noCol,
+.rowActionsCol,
+.toolCol {
+  z-index: 9;
+}
+
+.noCell,
+.rowActionsCell,
+.toolCell {
+  background: white;
+}
+
+.toolCell {
+  text-align: left;
+}
+
+td input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fbfdff;
+  color: #111827;
+  padding: 0 7px;
+  font-size: 14px;
+  font-weight: 700;
+  outline: none;
+  text-align: center;
+}
+
+.toolCell input {
+  text-align: left;
+}
+
+td input:focus {
+  border-color: #0057ff;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(0, 87, 255, 0.12);
+}
+
+.dateShow {
+  min-height: 15px;
+  margin-top: 3px;
+  color: #0057ff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  line-height: 1.05;
+}
+
+.toggle {
+  width: 58px;
+  height: 29px;
+  border: 0;
+  border-radius: 8px;
+  background: #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 4px;
+  color: white;
+  font-size: 9px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.toggle.active {
+  background: #0ca236;
+}
+
+.toggle i {
+  width: 21px;
+  height: 21px;
+  background: white;
+  border-radius: 6px;
+  display: block;
+}
+
+.daysCell {
+  color: #0057ff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.amountCell {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.totalRow td {
+  background: #eef5ff;
+  color: #0057ff;
+  font-weight: 900;
+}
+
+.tableActions {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr;
+  gap: 10px;
+}
+
+.tableActions button {
+  min-height: 46px;
+  border-radius: 9px;
+  border: 0;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.addRowsBtn {
+  color: #111827;
+  background: linear-gradient(135deg, #ffe45c, #ff8a00);
+}
+
+.clearRowsBtn {
+  color: white;
+  background: #7c3aed;
+}
+
+.saveRowsBtn {
+  background: #0057ff;
+  color: white;
+}
+
+.rightPanel {
+  min-width: 260px;
+  background: linear-gradient(180deg, #0044bf, #003079 65%, #061426);
+  color: white;
+  border-radius: 8px;
+  padding: 22px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brandBlock {
+  text-align: center;
+  padding: 8px 4px 12px;
+}
+
+.brandBlock h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 54px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+
+.brandBlock h2 {
+  margin: 8px 0 0;
+  font-size: clamp(20px, 2.4vw, 32px);
+  font-weight: 800;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.summaryCard {
+  min-height: 92px;
+  border-radius: 9px;
+  padding: 14px 10px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.summaryCard span {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.summaryCard strong {
+  margin-top: 4px;
+  font-size: 27px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.summaryCard.green {
+  background: linear-gradient(135deg, #0aa747, #31b971);
+}
+
+.summaryCard.blue {
+  background: linear-gradient(135deg, #0047bf, #2666d3);
+}
+
+.summaryCard.yellow {
+  background: linear-gradient(135deg, #ffd21a, #ff9d00);
+  color: #111827;
+}
+
+.summaryCard.purple {
+  background: linear-gradient(135deg, #5b2ea3, #8b4ed8);
+}
+
+.discountBox {
+  margin-top: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.discountBox label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.discountBox input {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+  border: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 900;
+  outline: none;
+}
+
+.discountLine {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.discountLine span {
+  font-weight: 900;
+}
+
+.discountLine strong {
+  color: #ffd54a;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.grandCard {
+  background: #061426;
+  border-radius: 10px;
+  padding: 20px 12px;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.grandCard span {
+  display: block;
+  font-size: 16px;
+  font-weight: 900;
+  opacity: 0.9;
+}
+
+.grandCard strong {
+  display: block;
+  margin-top: 6px;
+  color: #38bdf8;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.shareTitle {
+  margin-top: 2px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.jpgBtn,
+.waBtn,
+.resetBtn {
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  min-height: 54px;
+  color: white;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.jpgBtn {
+  background: #08a434;
+}
+
+.waBtn {
+  background: #16a34a;
+}
+
+.resetBtn {
+  background: #ef2d2d;
+}
+
+.panelFooter {
+  margin-top: auto;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.7;
+  opacity: 0.92;
+}
+
+@media (min-width: 1200px) {
+  .page {
+    padding: 12px;
+  }
+
+  .appLayout {
+    grid-template-columns: minmax(0, 74%) minmax(300px, 26%);
+  }
+
+  .rentTable {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 1199px) {
+  .appLayout {
+    grid-template-columns: minmax(0, 72%) minmax(250px, 28%);
+  }
+
+  .rentTable {
+    min-width: 960px;
+  }
+
+  th {
+    font-size: 13px;
+  }
+
+  td {
+    height: 48px;
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  td input {
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .toolCol,
+  .toolCell {
+    width: 180px;
+  }
+
+  .dateCol {
+    width: 118px;
+  }
+}
+
+@media (max-width: 950px) and (orientation: landscape) {
+  .page {
+    padding: 6px;
+  }
+
+  .appLayout {
+    min-height: calc(100vh - 12px);
+    grid-template-columns: minmax(0, 75%) minmax(210px, 25%);
+    gap: 6px;
+  }
+
+  .customerBox {
+    grid-template-columns: 110px 1fr;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+  }
+
+  .customerBox label {
+    font-size: 12px;
+  }
+
+  .customerBox input {
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .sheetScroll {
+    max-height: calc(100vh - 100px);
+  }
+
+  .rentTable {
+    min-width: 840px;
+  }
+
+  th {
+    font-size: 10px;
+    padding: 6px 4px;
+  }
+
+  td {
+    height: 39px;
+    padding: 4px;
+    font-size: 10px;
+  }
+
+  td input {
+    height: 27px;
+    font-size: 10px;
+    padding: 0 4px;
+  }
+
+  .noCol,
+  .noCell {
+    width: 30px;
+  }
+
+  .rowActionsCol,
+  .rowActionsCell {
+    left: 30px;
+  }
+
+  .toolCol,
+  .toolCell {
+    width: 150px;
+    left: 104px;
+  }
+
+  .qtyCol {
+    width: 45px;
+  }
+
+  .rentCol {
+    width: 58px;
+  }
+
+  .sundayCol {
+    width: 65px;
+  }
+
+  .dateCol {
+    width: 96px;
+  }
+
+  .dayCol {
+    width: 48px;
+  }
+
+  .amountCol {
+    width: 62px;
+  }
+
+
+  .dateShow {
+    display: none;
+  }
+
+  .toggle {
+    width: 44px;
+    height: 23px;
+    font-size: 8px;
+  }
+
+  .toggle i {
+    width: 16px;
+    height: 16px;
+  }
+
+  .tableActions {
+    margin-top: 6px;
+    gap: 6px;
+  }
+
+  .tableActions button {
+    min-height: 34px;
+    font-size: 11px;
+  }
+
+  .rightPanel {
+    padding: 10px 7px;
+    gap: 8px;
+  }
+
+  .brandBlock {
+    padding: 2px;
+  }
+
+  .brandBlock h1 {
+    font-size: 25px;
+  }
+
+  .brandBlock h2 {
+    font-size: 16px;
+    margin-top: 4px;
+  }
+
+  .summaryGrid {
+    gap: 6px;
+  }
+
+  .summaryCard {
+    min-height: 58px;
+    padding: 7px 5px;
+  }
+
+  .summaryCard span {
+    font-size: 10px;
+  }
+
+  .summaryCard strong {
+    font-size: 19px;
+  }
+
+  .grandCard {
+    padding: 9px 5px;
+  }
+
+  .grandCard span {
+    font-size: 11px;
+  }
+
+  .grandCard strong {
+    font-size: 26px;
+  }
+
+  .shareTitle {
+    font-size: 13px;
+  }
+
+  .jpgBtn,
+  .waBtn,
+  .resetBtn {
+    min-height: 35px;
+    font-size: 11px;
+  }
+
+  .panelFooter {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .discountBox {
+    padding: 8px;
+  }
+
+  .discountBox label {
+    font-size: 11px;
+  }
+
+  .discountBox input {
+    height: 32px;
+    font-size: 15px;
+  }
+
+  .discountLine {
+    padding: 8px;
+  }
+
+  .discountLine span {
+    font-size: 11px;
+  }
+
+  .discountLine strong {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .page {
+    padding: 8px;
+  }
+
+  .appLayout {
+    display: block;
+  }
+
+  .rightPanel {
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+
+  .customerBox {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 9px 10px;
+  }
+
+  .customerBox label {
+    font-size: 12px;
+  }
+
+  .customerBox input {
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .sheetScroll {
+    max-height: 62vh;
+  }
+
+  .rentTable {
+    min-width: 840px;
+  }
+
+  th {
+    font-size: 11px;
+    padding: 7px 4px;
+  }
+
+  td {
+    height: 46px;
+    padding: 4px;
+    font-size: 11px;
+  }
+
+  td input {
+    height: 30px;
+    font-size: 11px;
+    padding: 0 4px;
+  }
+
+  .noCol,
+  .noCell {
+    width: 30px;
+  }
+
+  .rowActionsCol,
+  .rowActionsCell {
+    left: 30px;
+  }
+
+  .toolCol,
+  .toolCell {
+    width: 145px;
+    left: 104px;
+  }
+
+  .qtyCol {
+    width: 48px;
+  }
+
+  .rentCol {
+    width: 58px;
+  }
+
+  .sundayCol {
+    width: 62px;
+  }
+
+  .dateCol {
+    width: 95px;
+  }
+
+  .dayCol {
+    width: 48px;
+  }
+
+  .amountCol {
+    width: 68px;
+  }
+
+
+  .dateShow {
+    font-size: 9px;
+  }
+
+  .toggle {
+    width: 44px;
+    height: 24px;
+    font-size: 8px;
+  }
+
+  .toggle i {
+    width: 16px;
+    height: 16px;
+  }
+
+  .tableActions {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .tableActions button {
+    min-height: 42px;
+    font-size: 13px;
+  }
+}
+
+
+@media (max-width: 950px) and (orientation: landscape) {
+  .rowActionsCol,
+  .rowActionsCell {
+    width: 74px;
+  }
+
+  .copyRowBtn,
+  .dragHandle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .copyRowBtn svg,
+  .dragHandle svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .rowActionsCol,
+  .rowActionsCell {
+    width: 74px;
+  }
+
+  .copyRowBtn,
+  .dragHandle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .copyRowBtn svg,
+  .dragHandle svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ===========================
+   PROFESSIONAL BILL - FINAL
+=========================== */
+
+.billCapture {
+  width: 1100px !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  padding: 18px !important;
+  font-family: "Poppins", "Noto Sans Malayalam", Arial, sans-serif !important;
+}
+
+.billHeader {
+  text-align: center !important;
+  margin-bottom: 4px !important;
+}
+
+.billLogo {
+  width: 420px !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0 auto 8px !important;
+}
+
+.billDate {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  margin-bottom: 12px !important;
+}
+
+.branchGrid {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 8px !important;
+  margin: 8px 0 14px !important;
+}
+
+.branchCard {
+  border: 1px solid #bcd3f7 !important;
+  border-radius: 8px !important;
+  background: #f8fbff !important;
+  padding: 10px 8px !important;
+  text-align: center !important;
+  min-height: 96px !important;
+}
+
+.branchCard strong {
+  display: block !important;
+  color: #0057ff !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  margin-bottom: 5px !important;
+}
+
+.branchCard span {
+  display: block !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  color: #374151 !important;
+  margin-bottom: 5px !important;
+}
+
+.branchCard b {
+  display: block !important;
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  color: #111827 !important;
+}
+
+.billCustomer {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 14px 0 9px !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+.billCustomer strong,
+.billCustomer b {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+.billTable {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  margin-top: 8px !important;
+  overflow: hidden !important;
+}
+
+.billTable th {
+  position: static !important;
+  background: #0057ff !important;
+  color: #ffffff !important;
+  border: 1px solid #c7d7f2 !important;
+  padding: 10px 6px !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.billTable td {
+  border: 1px solid #d7e3f3 !important;
+  padding: 10px 7px !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  background: #ffffff !important;
+}
+
+.billTable td small {
+  display: block !important;
+  font-size: 12px !important;
+  color: #111827 !important;
+  margin-top: 2px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+}
+
+.billTable th:nth-child(1),
+.billTable td:nth-child(1) {
+  width: 42px !important;
+}
+
+.billTable th:nth-child(2),
+.billTable td:nth-child(2) {
+  width: 28% !important;
+  text-align: left !important;
+  padding-left: 12px !important;
+  font-weight: 900 !important;
+}
+
+.billTable td:nth-child(2) {
+  font-size: 19px !important;
+}
+
+.billTable th:nth-child(3),
+.billTable td:nth-child(3) {
+  width: 65px !important;
+}
+
+.billTable th:nth-child(4),
+.billTable td:nth-child(4) {
+  width: 105px !important;
+}
+
+.billTable th:nth-child(5),
+.billTable td:nth-child(5),
+.billTable th:nth-child(6),
+.billTable td:nth-child(6) {
+  width: 135px !important;
+}
+
+.billTable th:nth-child(7),
+.billTable td:nth-child(7) {
+  width: 72px !important;
+}
+
+.billTable th:nth-child(8),
+.billTable td:nth-child(8) {
+  width: 105px !important;
+  font-weight: 900 !important;
+}
+
+.billTotalRow td {
+  background: #eef5ff !important;
+  color: #0057ff !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+}
+
+.billBottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 220px !important;
+  gap: 28px !important;
+  margin-top: 12px !important;
+  align-items: start !important;
+}
+
+.billSummary,
+.billFinal {
+  grid-column: 1 !important;
+}
+
+.billSummary p,
+.billFinal p {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin: 5px 0 !important;
+  font-size: 18px !important;
+}
+
+.billSummary span,
+.billFinal span {
+  font-weight: 900 !important;
+}
+
+.billSummary b,
+.billFinal b {
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.paymentCard {
+  grid-column: 2 !important;
+  grid-row: 1 / span 2 !important;
+  justify-self: end !important;
+  align-self: start !important;
+  width: 210px !important;
+  border: 2px solid #0057ff !important;
+  border-radius: 10px !important;
+  padding: 8px !important;
+  background: #ffffff !important;
+  text-align: center !important;
+}
+
+.paymentHead {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 5px !important;
+  width: 100% !important;
+  margin-bottom: 6px !important;
+  color: #111827 !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+}
+
+.paymentHead strong {
+  color: #0057ff !important;
+  font-weight: 900 !important;
+}
+
+.paymentQr {
+  width: 175px !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+.billCreated {
+  margin-top: 10px !important;
+  padding-top: 8px !important;
+  padding-right: 245px !important;
+  border-top: 1px solid #d1d5db !important;
+  text-align: left !important;
+  font-weight: 700 !important;
+  color: #4b5563 !important;
+}
+
+.billTagline {
+  margin-bottom: 7px !important;
+  color: #0057ff !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.billCreatedText {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+.billCopyright {
+  margin-top: 10px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #444 !important;
+}
+
+/* Shared JPG only */
+.forceDesktopBill {
+  width: 1200px !important;
+  min-width: 1200px !important;
+  max-width: 1200px !important;
+  padding: 20px !important;
+  background: #ffffff !important;
+}
+
+.forceDesktopBill .billLogo {
+  width: 420px !important;
+}
+
+.forceDesktopBill .billDate {
+  font-size: 16px !important;
+}
+
+.forceDesktopBill .branchCard strong {
+  font-size: 14px !important;
+}
+
+.forceDesktopBill .branchCard span {
+  font-size: 17.25px !important;
+  line-height: 1.2 !important;
+}
+
+.forceDesktopBill .branchCard b {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+.forceDesktopBill .billCustomer,
+.forceDesktopBill .billCustomer strong,
+.forceDesktopBill .billCustomer b {
+  font-size: 18px !important;
+}
+
+.forceDesktopBill .billTable th {
+  font-size: 17px !important;
+  padding: 10px 6px !important;
+}
+
+.forceDesktopBill .billTable td {
+  font-size: 18px !important;
+  padding: 10px 7px !important;
+}
+
+.forceDesktopBill .billTable td:nth-child(2) {
+  font-size: 19px !important;
+}
+
+.forceDesktopBill .billTable td small {
+  font-size: 12px !important;
+}
+
+.forceDesktopBill .billTotalRow td {
+  font-size: 20px !important;
+}
+
+.forceDesktopBill .billBottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 220px !important;
+  gap: 28px !important;
+  align-items: start !important;
+}
+
+.forceDesktopBill .billSummary p,
+.forceDesktopBill .billFinal p {
+  font-size: 18px !important;
+}
+
+.forceDesktopBill .billSummary b,
+.forceDesktopBill .billFinal b {
+  font-size: 22px !important;
+}
+
+.forceDesktopBill .paymentCard {
+  width: 210px !important;
+  padding: 8px !important;
+}
+
+.forceDesktopBill .paymentHead {
+  font-size: 17px !important;
+}
+
+.forceDesktopBill .paymentQr {
+  width: 175px !important;
+  height: auto !important;
+  margin: 0 auto !important;
+}
+
+.forceDesktopBill .billTagline {
+  font-size: 13px !important;
+}
+
+.forceDesktopBill .billCreatedText {
+  font-size: 12px !important;
+}
+
+.forceDesktopBill .billCopyright {
+  font-size: 11px !important;
+}
+
+/* ===========================
+   INDEXEDDB SAVED DRAFTS
+=========================== */
+
+.saveStatus {
+  grid-column: 2 / 3;
+  color: #0ca236;
+  font-size: 12px;
+  font-weight: 900;
+  margin-top: -4px;
+}
+
+.draftBtn {
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  min-height: 54px;
+  color: white;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+  background: #f59e0b;
+}
+
+.draftOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.draftModal {
+  width: min(560px, 100%);
+  max-height: 86vh;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.draftModalHead {
+  background: linear-gradient(135deg, #0057ff, #003da9);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+.draftModalHead h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.draftModalHead button {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.draftSearch {
+  margin: 14px;
+  width: calc(100% - 28px);
+  height: 46px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 16px;
+  font-weight: 800;
+  outline: none;
+}
+
+.draftList {
+  overflow-y: auto;
+  padding: 0 14px 14px;
+}
+
+.emptyDraft {
+  padding: 18px;
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.draftItem {
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.draftOpen {
+  border: 1px solid #dbeafe;
+  background: #f8fbff;
+  color: #111827;
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.draftOpen strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 900;
+  color: #0057ff;
+}
+
+.draftOpen span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.draftDelete {
+  border: 0;
+  border-radius: 12px;
+  background: #ef2d2d;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 950px) and (orientation: landscape) {
+  .saveStatus {
+    grid-column: 2 / 3;
+    font-size: 10px;
+    margin-top: -3px;
+  }
+
+  .draftBtn {
+    min-height: 35px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .saveStatus {
+    grid-column: 1 / -1;
+    font-size: 10px;
+    margin-top: -2px;
+  }
+
+  .draftBtn {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .draftModalHead h3 {
+    font-size: 18px;
+  }
+
+  .draftSearch {
+    height: 42px;
+    font-size: 14px;
+  }
+}
+
+/* Main-app return button added outside the calculator bill capture. */
+.calculatorBackButton {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 9999;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 13px;
+  background: rgba(122, 0, 0, 0.95);
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 8px 22px rgba(40, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.calculatorBackButton:active {
+  transform: scale(0.97);
+}
