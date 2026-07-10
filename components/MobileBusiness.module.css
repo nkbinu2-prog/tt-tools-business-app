@@ -1284,3 +1284,335 @@
     font-size: 11px;
   }
 }
+
+/* Tools Movement compact table + moving tool position */
+.movementEntryTable {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.movementEntryRow {
+  width: 100%;
+  min-width: 510px;
+  display: grid;
+  grid-template-columns: 28px minmax(150px, 1.35fr) minmax(120px, 0.8fr) minmax(170px, 1.1fr);
+  gap: 6px;
+  align-items: center;
+  padding: 6px;
+  border: 1px solid #e0e4ea;
+  border-radius: 11px;
+  background: #fbfcfe;
+  overflow: visible;
+}
+
+.movementEntryRow .rowNumber {
+  width: 28px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.movementToolField,
+.movementFromField,
+.movementNoteField {
+  min-width: 0;
+  height: 38px;
+  font-size: 12px;
+}
+
+.activeButtonRows {
+  display: grid;
+  gap: 8px;
+}
+
+.activeButtonRow {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 5px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.activeButtonRow::-webkit-scrollbar {
+  display: none;
+}
+
+.drawerStageButton {
+  flex: 0 0 58px;
+  min-width: 58px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #eceff3;
+  color: #8b929c;
+  font: inherit;
+  cursor: pointer;
+  transition: flex-basis 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+.drawerStagePast {
+  flex-basis: 76px;
+  background: linear-gradient(135deg, #e22b00, #c91100);
+  color: #fff;
+  opacity: 0.9;
+}
+
+.drawerStageCurrent {
+  flex: 1 1 170px;
+  min-width: 145px;
+  max-width: 280px;
+  background: linear-gradient(135deg, #f23800, #d31600);
+  color: #fff;
+  box-shadow: 0 7px 16px rgba(204, 30, 0, 0.22);
+}
+
+.drawerStageNext {
+  background: #ffd3c6;
+  color: #a62a0b;
+  opacity: 0.68;
+  border: 1px solid #ef9d86;
+}
+
+.drawerStageFuture,
+.drawerStageButton:disabled {
+  background: #eef0f3;
+  color: #a4a9b0;
+  opacity: 0.34;
+  cursor: default;
+}
+
+.drawerStageText {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.drawerStageCurrent .drawerStageText {
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .movementEntryRow {
+    min-width: 480px;
+    grid-template-columns: 25px minmax(140px, 1.3fr) minmax(108px, 0.78fr) minmax(150px, 1fr);
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .movementEntryRow > .select,
+  .movementEntryRow > .field,
+  .movementEntryRow > input.field:last-child,
+  .movementEntryRow > input.field:not(:last-child) {
+    grid-column: auto;
+  }
+
+  .movementTopActions {
+    justify-content: stretch;
+  }
+
+  .drawerOpenButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 430px) {
+  .movementEntryRow {
+    min-width: 455px;
+    grid-template-columns: 24px minmax(132px, 1.25fr) minmax(104px, 0.75fr) minmax(145px, 1fr);
+  }
+
+  .drawerStageButton {
+    flex-basis: 52px;
+    min-width: 52px;
+    min-height: 44px;
+    padding: 6px;
+  }
+
+  .drawerStagePast {
+    flex-basis: 66px;
+  }
+
+  .drawerStageCurrent {
+    flex-basis: 150px;
+    min-width: 138px;
+  }
+
+  .drawerStageText {
+    font-size: 10px;
+  }
+
+  .drawerStageCurrent .drawerStageText {
+    font-size: 12px;
+  }
+}
+
+
+/* Simple, readable typography across the mobile business screens */
+.screen,
+.screen button,
+.screen input,
+.screen select,
+.screen textarea {
+  font-family: inherit;
+}
+
+.screen input,
+.screen select,
+.screen textarea,
+.screen p,
+.screen td {
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.screen h1,
+.screen h2,
+.screen h3 {
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.screen button,
+.screen label,
+.screen th {
+  font-weight: 600;
+}
+
+/* Active movement drawer: each tool row uses a different readable colour */
+.activeDrawer {
+  background: #f7f8fa;
+}
+
+.activeButtonRow {
+  --movement-main: #d92d20;
+  --movement-dark: #a61b12;
+  --movement-soft: #fee4e2;
+  --movement-soft-text: #7a271a;
+  --movement-border: #f5b7b1;
+  --movement-surface: #fff4f2;
+  padding: 7px;
+  border: 1px solid var(--movement-border);
+  border-radius: 15px;
+  background: var(--movement-surface);
+}
+
+.activeButtonRow:nth-child(8n + 1) {
+  --movement-main: #d92d20;
+  --movement-dark: #a61b12;
+  --movement-soft: #fee4e2;
+  --movement-soft-text: #7a271a;
+  --movement-border: #f5b7b1;
+  --movement-surface: #fff4f2;
+}
+
+.activeButtonRow:nth-child(8n + 2) {
+  --movement-main: #175cd3;
+  --movement-dark: #1849a9;
+  --movement-soft: #dbeafe;
+  --movement-soft-text: #194185;
+  --movement-border: #a9c7f5;
+  --movement-surface: #f3f7ff;
+}
+
+.activeButtonRow:nth-child(8n + 3) {
+  --movement-main: #16803c;
+  --movement-dark: #11642f;
+  --movement-soft: #dcfce7;
+  --movement-soft-text: #14532d;
+  --movement-border: #a6e6ba;
+  --movement-surface: #f2fff6;
+}
+
+.activeButtonRow:nth-child(8n + 4) {
+  --movement-main: #7a3ec8;
+  --movement-dark: #5f2ba8;
+  --movement-soft: #ede3ff;
+  --movement-soft-text: #4c1d95;
+  --movement-border: #c9b2ef;
+  --movement-surface: #faf7ff;
+}
+
+.activeButtonRow:nth-child(8n + 5) {
+  --movement-main: #c96a00;
+  --movement-dark: #9f4f00;
+  --movement-soft: #ffedd5;
+  --movement-soft-text: #7c2d12;
+  --movement-border: #f4c58d;
+  --movement-surface: #fff9f1;
+}
+
+.activeButtonRow:nth-child(8n + 6) {
+  --movement-main: #087f8c;
+  --movement-dark: #05616b;
+  --movement-soft: #cffafe;
+  --movement-soft-text: #155e75;
+  --movement-border: #94d9df;
+  --movement-surface: #f0fdff;
+}
+
+.activeButtonRow:nth-child(8n + 7) {
+  --movement-main: #3346b8;
+  --movement-dark: #27358f;
+  --movement-soft: #e0e7ff;
+  --movement-soft-text: #312e81;
+  --movement-border: #afb9ef;
+  --movement-surface: #f5f6ff;
+}
+
+.activeButtonRow:nth-child(8n + 8) {
+  --movement-main: #b42373;
+  --movement-dark: #8f1b5b;
+  --movement-soft: #fce7f3;
+  --movement-soft-text: #831843;
+  --movement-border: #efb3d2;
+  --movement-surface: #fff5fa;
+}
+
+.activeButtonRow .drawerStagePast {
+  background: var(--movement-dark);
+  color: #fff;
+  opacity: 0.88;
+}
+
+.activeButtonRow .drawerStageCurrent {
+  background: var(--movement-main);
+  color: #fff;
+  box-shadow: 0 5px 12px rgb(15 23 42 / 16%);
+}
+
+.activeButtonRow .drawerStageNext {
+  background: var(--movement-soft);
+  color: var(--movement-soft-text);
+  border: 1px solid var(--movement-border);
+  opacity: 0.72;
+}
+
+.activeButtonRow .drawerStageFuture,
+.activeButtonRow .drawerStageButton:disabled {
+  background: #ffffff;
+  color: #9ca3af;
+  border: 1px solid #e5e7eb;
+  opacity: 0.35;
+}
+
+.drawerStageText {
+  font-weight: 600;
+  letter-spacing: 0;
+}

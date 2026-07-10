@@ -5,7 +5,6 @@ import AppShell from "@/components/AppShell";
 import ui from "@/components/MobileBusiness.module.css";
 import {
   MOVEMENT_DESTINATIONS,
-  SHOPS,
   STORAGE_KEYS,
   createMovementDraftRow,
   formatDateTime,
@@ -28,13 +27,29 @@ type StageEditor = {
   readOnly: boolean;
 };
 
-function makeRows(count = 7) {
+const LOCATION_CODES: Record<string, string> = {
+  Karuvannur: "KVR",
+  Ollur: "OLLR",
+  Kachery: "KCH",
+  "Mulayam Rd": "MLR",
+  Pattikkad: "PTT",
+  Brotech: "BRTC",
+  "Siju Poochatty": "SJP",
+  "Prijo Kachery": "PRJ",
+  "MJ Tools": "MJ",
+  Global: "GLBL",
+  iBell: "IBELL",
+  Vincent: "VINC",
+  Other: "OTHER",
+};
+
+function makeRows(count = 8) {
   return Array.from({ length: count }, () => createMovementDraftRow());
 }
 
 function stageLabel(step: StageNumber) {
   if (step === 1) return "Picked";
-  if (step === 2) return "Reached";
+  if (step === 2) return "Delivered";
   if (step === 3) return "Taken Back";
   return "Final";
 }
@@ -46,10 +61,23 @@ function stageDetails(record: MovementRecord, step: StageNumber) {
   return record.step4;
 }
 
+function shortLocation(location?: string) {
+  const clean = location?.trim() || "";
+  if (!clean) return "—";
+  return LOCATION_CODES[clean] || clean;
+}
+
+function movementPath(record: MovementRecord) {
+  const locations = ([1, 2, 3, 4] as StageNumber[])
+    .map((step) => stageDetails(record, step)?.location?.trim())
+    .filter((location): location is string => Boolean(location));
+
+  return locations.length > 0 ? locations.join(" → ") : record.homeShop;
+}
+
 export default function ToolsMovementPage() {
   const { items, setItems } = useStoredList<MovementRecord>(STORAGE_KEYS.movements);
-  const [rows, setRows] = useState<MovementDraftRow[]>(() => makeRows(7));
-  const [customDestinations, setCustomDestinations] = useState<Record<string, string>>({});
+  const [rows, setRows] = useState<MovementDraftRow[]>(() => makeRows());
   const [showDrawer, setShowDrawer] = useState(false);
   const [editor, setEditor] = useState<StageEditor | null>(null);
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("Active");
@@ -90,10 +118,6 @@ export default function ToolsMovementPage() {
     setRows((current) => current.map((row) => row.id === id ? { ...row, ...patch } : row));
   }
 
-  function changeQty(id: string, difference: number) {
-    setRows((current) => current.map((row) => row.id === id ? { ...row, qty: Math.max(1, row.qty + difference) } : row));
-  }
-
   function startMovements(event: FormEvent) {
     event.preventDefault();
     const readyRows = rows.filter((row) => row.tool.trim());
@@ -101,31 +125,25 @@ export default function ToolsMovementPage() {
 
     const now = Date.now();
     const startedAt = nowLocalDateTime();
-    const newItems: MovementRecord[] = readyRows.map((row) => {
-      const destination = row.destination === "Other"
-        ? (customDestinations[row.id]?.trim() || "Other")
-        : row.destination;
-      return {
-        id: makeId("movement"),
-        tool: row.tool.trim(),
-        qty: row.qty,
-        homeShop: row.homeShop,
-        firstDestination: destination,
-        startNotes: row.notes.trim(),
-        stage: 1,
-        step1: {
-          at: startedAt,
-          location: row.homeShop,
-          notes: row.notes.trim(),
-        },
-        createdAt: now,
-        updatedAt: now,
-      };
-    });
+    const newItems: MovementRecord[] = readyRows.map((row) => ({
+      id: makeId("movement"),
+      tool: row.tool.trim(),
+      qty: 1,
+      homeShop: row.homeShop,
+      firstDestination: "",
+      startNotes: row.notes.trim(),
+      stage: 1,
+      step1: {
+        at: startedAt,
+        location: row.homeShop,
+        notes: row.notes.trim(),
+      },
+      createdAt: now,
+      updatedAt: now,
+    }));
 
     setItems((current) => [...newItems, ...current]);
-    setRows(makeRows(7));
-    setCustomDestinations({});
+    setRows(makeRows());
     setHistoryFilter("Active");
     setShowDrawer(true);
   }
@@ -148,7 +166,7 @@ export default function ToolsMovementPage() {
       recordId: record.id,
       step,
       at: existing?.at || nowLocalDateTime(),
-      location: existing?.location || defaultLocation,
+      location: existing?.location || defaultLocation || "",
       notes: existing?.notes || "",
       finalAction: step === 4 && record.step4?.finalAction ? record.step4.finalAction : "Returned Home",
       readOnly: completed,
@@ -168,7 +186,13 @@ export default function ToolsMovementPage() {
       };
 
       if (editor.step === 2) {
-        return { ...record, stage: 2, step2: common, updatedAt: Date.now() };
+        return {
+          ...record,
+          firstDestination: common.location,
+          stage: 2,
+          step2: common,
+          updatedAt: Date.now(),
+        };
       }
       if (editor.step === 3) {
         return { ...record, stage: 3, step3: common, updatedAt: Date.now() };
@@ -191,13 +215,12 @@ export default function ToolsMovementPage() {
     setItems((current) => current.filter((item) => item.id !== id));
   }
 
-
   return (
-    <AppShell title="Tools Movement" subtitle="Move many tools and update each stage with one tap">
+    <AppShell title="Tools Movement" subtitle="Enter tools quickly, then move each one through four stops">
       <div className={ui.screen}>
         <div className={ui.movementTopActions}>
           <button type="button" className={ui.drawerOpenButton} onClick={() => setShowDrawer(true)}>
-            Active Movement Drawer <span>{activeItems.length}</span>
+            Active Movements <span>{activeItems.length}</span>
           </button>
         </div>
 
@@ -205,7 +228,7 @@ export default function ToolsMovementPage() {
           <div className={ui.movementHeader}>
             <div>
               <h2>Start Moving Tools</h2>
-              <p>Enter up to seven or more tools, then tap Start Movement.</p>
+              <p>Tool, From and Note only. The first stage starts automatically.</p>
             </div>
           </div>
 
@@ -213,44 +236,31 @@ export default function ToolsMovementPage() {
             {rows.map((row, index) => (
               <div className={ui.movementEntryRow} key={row.id}>
                 <div className={ui.rowNumber}>{index + 1}</div>
-                <div className={ui.movementMainField}>
-                  <input
-                    className={ui.field}
-                    value={row.tool}
-                    onChange={(event) => updateRow(row.id, { tool: event.target.value })}
-                    placeholder="Tool name"
-                  />
-                </div>
-                <div className={ui.qtyControl}>
-                  <button type="button" className={ui.qtyButton} onClick={() => changeQty(row.id, -1)}>−</button>
-                  <div className={ui.qtyValue}>{row.qty}</div>
-                  <button type="button" className={ui.qtyButton} onClick={() => changeQty(row.id, 1)}>+</button>
-                </div>
-                <select className={ui.select} value={row.homeShop} onChange={(event) => updateRow(row.id, { homeShop: event.target.value })}>
-                  {SHOPS.map((shop) => <option key={shop}>{shop}</option>)}
-                </select>
-                <select className={ui.select} value={row.destination} onChange={(event) => updateRow(row.id, { destination: event.target.value })}>
-                  {MOVEMENT_DESTINATIONS.map((destination) => <option key={destination}>{destination}</option>)}
-                </select>
-                {row.destination === "Other" ? (
-                  <input
-                    className={ui.field}
-                    value={customDestinations[row.id] || ""}
-                    onChange={(event) => setCustomDestinations((current) => ({ ...current, [row.id]: event.target.value }))}
-                    placeholder="Destination name"
-                  />
-                ) : null}
                 <input
-                  className={ui.field}
+                  className={`${ui.field} ${ui.movementToolField}`}
+                  value={row.tool}
+                  onChange={(event) => updateRow(row.id, { tool: event.target.value })}
+                  placeholder="Tool"
+                />
+                <select
+                  className={`${ui.select} ${ui.movementFromField}`}
+                  value={row.homeShop}
+                  onChange={(event) => updateRow(row.id, { homeShop: event.target.value })}
+                  aria-label={`From location for row ${index + 1}`}
+                >
+                  {MOVEMENT_DESTINATIONS.map((location) => <option key={location}>{location}</option>)}
+                </select>
+                <input
+                  className={`${ui.field} ${ui.movementNoteField}`}
                   value={row.notes}
                   onChange={(event) => updateRow(row.id, { notes: event.target.value })}
-                  placeholder="Note (optional)"
+                  placeholder="Note"
                 />
               </div>
             ))}
           </div>
 
-          <button type="button" className={ui.addRowsButton} onClick={() => setRows((current) => [...current, ...makeRows(7)])}>+ Add 7 Rows</button>
+          <button type="button" className={ui.addRowsButton} onClick={() => setRows((current) => [...current, ...makeRows()])}>+ Add 8 Rows</button>
           <button type="submit" className={ui.startMovementButton}>Start Movement</button>
         </form>
 
@@ -272,7 +282,7 @@ export default function ToolsMovementPage() {
                 <div className={ui.historyTitleRow}>
                   <div>
                     <h3>{record.tool}</h3>
-                    <p>Qty {record.qty} · {record.homeShop} → {record.firstDestination}</p>
+                    <p>{movementPath(record)}</p>
                   </div>
                   <span className={`${ui.statusBadge} ${record.stage === 4 ? ui.completedStatus : ui.activeStatus}`}>
                     {record.stage === 4 ? "Completed" : `Stage ${record.stage}/4`}
@@ -284,7 +294,7 @@ export default function ToolsMovementPage() {
                     return (
                       <button key={step} type="button" className={`${ui.historyStep} ${detail ? ui.historyStepDone : ""}`} onClick={() => detail ? openStage(record, step) : undefined}>
                         <b>{step}</b>
-                        <span>{step === 1 ? record.tool : stageLabel(step)}</span>
+                        <span>{detail ? shortLocation(detail.location) : stageLabel(step)}</span>
                       </button>
                     );
                   })}
@@ -294,7 +304,7 @@ export default function ToolsMovementPage() {
                   {record.step4 ? ` · Finished ${formatDateTime(record.step4.at)}` : ""}
                 </div>
                 <div className={ui.cardActions}>
-                  {record.stage < 4 ? <button type="button" className={ui.smallButton} onClick={() => setShowDrawer(true)}>Open Drawer</button> : null}
+                  {record.stage < 4 ? <button type="button" className={ui.smallButton} onClick={() => setShowDrawer(true)}>Open Movements</button> : null}
                   <button type="button" className={ui.dangerButton} onClick={() => removeRecord(record.id)}>Delete</button>
                 </div>
               </article>
@@ -310,7 +320,7 @@ export default function ToolsMovementPage() {
             <div className={ui.drawerHeader}>
               <div>
                 <h2>Active Tools</h2>
-                <p>Tap only the next waiting button.</p>
+                <p>The large button shows where the tool is now. Tap the next faded button to continue.</p>
               </div>
               <button type="button" className={ui.drawerClose} onClick={() => setShowDrawer(false)}>×</button>
             </div>
@@ -322,20 +332,28 @@ export default function ToolsMovementPage() {
                 {activeItems.map((record) => (
                   <div className={ui.activeButtonRow} key={record.id}>
                     {([1, 2, 3, 4] as StageNumber[]).map((step) => {
-                      const done = step <= record.stage;
-                      const current = step === record.stage + 1;
-                      const disabled = !done && !current;
+                      const isPast = step < record.stage;
+                      const isCurrent = step === record.stage;
+                      const isNext = step === record.stage + 1;
+                      const isFuture = step > record.stage + 1;
+                      const detail = stageDetails(record, step);
+                      const currentLocation = detail?.location || record.homeShop;
+                      const label = isCurrent
+                        ? `${record.tool} • ${shortLocation(currentLocation)}`
+                        : isPast
+                          ? shortLocation(detail?.location)
+                          : String(step);
+
                       return (
                         <button
                           key={step}
                           type="button"
-                          className={`${ui.drawerStageButton} ${done ? ui.drawerStageDone : ""} ${current ? ui.drawerStageWaiting : ""}`}
-                          disabled={disabled}
+                          className={`${ui.drawerStageButton} ${isPast ? ui.drawerStagePast : ""} ${isCurrent ? ui.drawerStageCurrent : ""} ${isNext ? ui.drawerStageNext : ""} ${isFuture ? ui.drawerStageFuture : ""}`}
+                          disabled={isFuture}
                           onClick={() => openStage(record, step)}
+                          title={isCurrent ? `${record.tool} is at ${detail?.location || record.homeShop}` : undefined}
                         >
-                          <span className={ui.drawerStepNumber}>{step}</span>
-                          <span className={ui.drawerStepText}>{step === 1 ? record.tool : stageLabel(step)}</span>
-                          {done ? <span className={ui.drawerCheck}>✓</span> : null}
+                          <span className={ui.drawerStageText}>{label}</span>
                         </button>
                       );
                     })}
@@ -380,8 +398,8 @@ export default function ToolsMovementPage() {
 
             <div className={ui.formStack}>
               <div>
-                <label className={ui.label}>{editor.step === 3 ? "Collected From" : editor.step === 4 ? "Final Place" : "Location"}</label>
-                <input className={ui.field} value={editor.location} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, location: event.target.value })} />
+                <label className={ui.label}>{editor.step === 2 ? "Delivered To" : editor.step === 3 ? "Collected From" : editor.step === 4 ? "Final Place" : "From"}</label>
+                <input className={ui.field} value={editor.location} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, location: event.target.value })} placeholder="Location" />
               </div>
               <div>
                 <label className={ui.label}>Date & Time</label>

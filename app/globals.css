@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap");
 
 * {
   box-sizing: border-box;
@@ -8,12 +8,14 @@ body {
   margin: 0;
   background: #eef5ff;
   color: #111827;
-  font-family: "Poppins", "Noto Sans Malayalam", Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans Malayalam", sans-serif;
 }
 
 button,
-input {
-  font-family: "Poppins", "Noto Sans Malayalam", Arial, sans-serif;
+input,
+select,
+textarea {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans Malayalam", sans-serif;
 }
 
 .page {
@@ -988,7 +990,7 @@ td input:focus {
   background: #ffffff !important;
   color: #111827 !important;
   padding: 18px !important;
-  font-family: "Poppins", "Noto Sans Malayalam", Arial, sans-serif !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans Malayalam", sans-serif !important;
 }
 
 .billHeader {

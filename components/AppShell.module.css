@@ -45,7 +45,7 @@
   color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .navLinkActive {
@@ -95,14 +95,14 @@
   color: #9e0000;
   font-size: 27px;
   line-height: 1.05;
-  letter-spacing: -0.7px;
+  letter-spacing: 0;
 }
 
 .heading p {
   margin: 5px 0 0;
   color: #6b7280;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 400;
 }
 
 .content { min-width: 0; }
@@ -150,7 +150,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 17px;
-    letter-spacing: -0.25px;
+    letter-spacing: 0;
   }
 
   .heading p { display: none; }
@@ -184,7 +184,7 @@
     color: rgba(255, 255, 255, 0.86);
     text-decoration: none;
     font-size: 7.5px;
-    font-weight: 850;
+    font-weight: 600;
     line-height: 1.05;
     white-space: nowrap;
   }
