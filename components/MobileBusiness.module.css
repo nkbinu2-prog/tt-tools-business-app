@@ -1683,3 +1683,140 @@
     font-size: 10px;
   }
 }
+
+/* Final mobile override: force every Tools Movement entry to remain on one line */
+.screen {
+  font-weight: 500;
+}
+
+.screen input,
+.screen select,
+.screen textarea {
+  font-weight: 600;
+}
+
+.screen button,
+.screen label,
+.screen th {
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .movementEntryPanel {
+    padding: 6px !important;
+  }
+
+  .movementEntryTable {
+    width: 100% !important;
+    overflow-x: hidden !important;
+    gap: 4px !important;
+  }
+
+  .movementEntryRow {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-flow: row nowrap !important;
+    align-items: center !important;
+    gap: 3px !important;
+    padding: 3px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  .movementEntryRow .rowNumber {
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    height: 30px !important;
+    font-size: 9px !important;
+    border-radius: 6px !important;
+  }
+
+  .movementEntryRow > .movementToolField {
+    flex: 1.18 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .movementEntryRow > .movementFromField {
+    flex: 0 0 76px !important;
+    width: 76px !important;
+    min-width: 76px !important;
+  }
+
+  .movementEntryRow > .movementNoteField {
+    flex: 0.92 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .movementEntryRow > .movementToolField,
+  .movementEntryRow > .movementFromField,
+  .movementEntryRow > .movementNoteField {
+    grid-column: auto !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .movementEntryRow > .movementToolField,
+  .movementEntryRow > .movementNoteField {
+    padding: 0 4px !important;
+  }
+
+  .movementEntryRow > .movementFromField {
+    padding: 0 15px 0 4px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .movementEntryPanel {
+    padding: 4px !important;
+  }
+
+  .movementEntryRow {
+    gap: 2px !important;
+    padding: 2px !important;
+  }
+
+  .movementEntryRow .rowNumber {
+    flex-basis: 18px !important;
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 28px !important;
+    font-size: 8px !important;
+  }
+
+  .movementEntryRow > .movementFromField {
+    flex-basis: 68px !important;
+    width: 68px !important;
+    min-width: 68px !important;
+  }
+
+  .movementEntryRow > .movementToolField,
+  .movementEntryRow > .movementFromField,
+  .movementEntryRow > .movementNoteField {
+    height: 28px !important;
+    min-height: 28px !important;
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .movementEntryRow > .movementFromField {
+    flex-basis: 62px !important;
+    width: 62px !important;
+    min-width: 62px !important;
+    padding-right: 12px !important;
+  }
+
+  .movementEntryRow > .movementToolField,
+  .movementEntryRow > .movementFromField,
+  .movementEntryRow > .movementNoteField {
+    font-size: 8.5px !important;
+  }
+}
