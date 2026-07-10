@@ -1616,3 +1616,70 @@
   font-weight: 600;
   letter-spacing: 0;
 }
+
+/* Mobile Tools Movement entry table: keep Tool, From and Note on one line */
+@media (max-width: 760px) {
+  .movementEntryPanel {
+    padding: 8px;
+  }
+
+  .movementEntryTable {
+    width: 100%;
+    overflow-x: hidden;
+    gap: 5px;
+  }
+
+  .movementEntryRow {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 23px minmax(0, 1.25fr) minmax(78px, 0.82fr) minmax(0, 1fr);
+    gap: 4px;
+    padding: 4px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .movementEntryRow .rowNumber {
+    width: 23px;
+    height: 34px;
+    border-radius: 7px;
+    font-size: 10px;
+  }
+
+  .movementToolField,
+  .movementFromField,
+  .movementNoteField {
+    width: 100%;
+    min-width: 0;
+    height: 34px;
+    padding-left: 7px;
+    padding-right: 7px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 390px) {
+  .movementEntryPanel {
+    padding: 6px;
+  }
+
+  .movementEntryRow {
+    grid-template-columns: 21px minmax(0, 1.2fr) minmax(72px, 0.8fr) minmax(0, 0.95fr);
+    gap: 3px;
+    padding: 3px;
+  }
+
+  .movementEntryRow .rowNumber {
+    width: 21px;
+    height: 32px;
+  }
+
+  .movementToolField,
+  .movementFromField,
+  .movementNoteField {
+    height: 32px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 10px;
+  }
+}
