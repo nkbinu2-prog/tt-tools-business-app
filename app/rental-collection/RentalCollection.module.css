@@ -1,0 +1,25 @@
+.frameWrap {
+  width: 100%;
+  height: calc(100vh - 112px);
+  min-height: 620px;
+  overflow: hidden;
+  border: 1px solid #e3e7ed;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .frameWrap {
+    height: calc(100dvh - 144px);
+    min-height: 500px;
+    border-radius: 14px;
+  }
+}

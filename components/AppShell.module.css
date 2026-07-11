@@ -162,7 +162,7 @@
     bottom: max(5px, env(safe-area-inset-bottom));
     z-index: 120;
     display: grid;
-    grid-template-columns: repeat(6, minmax(54px, 1fr));
+    grid-template-columns: repeat(7, minmax(54px, 1fr));
     gap: 2px;
     padding: 5px;
     overflow-x: auto;

@@ -1,8 +1,8 @@
 "use client";
 
 import html2canvas from "html2canvas";
-import Link from "next/link";
 import { type PointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import AppShell from "../../components/AppShell";
 
 type Row = {
   tool: string;
@@ -601,11 +601,12 @@ ${lines.join("\n")}
   }
 
   return (
-    <main className="page">
-      <Link href="/reminders" className="calculatorBackButton" aria-label="Back to main app">
-        ← Main App
-      </Link>
-      <div className="appLayout">
+    <AppShell
+      title="Rental Calculator"
+      subtitle="Calculate tool rental amounts and prepare customer bills"
+    >
+      <main className="page">
+        <div className="appLayout">
         <section className="leftPanel">
           <div className="customerBox">
             <label>ഉപഭോക്താവിന്റെ പേര്</label>
@@ -1043,9 +1044,8 @@ ${lines.join("\n")}
             © 2026 Tried &amp; True Tools Rentals. All rights reserved.
           </div>
         </div>
-      </div>
-    </main>
+        </div>
+      </main>
+    </AppShell>
   );
-  
 }
-

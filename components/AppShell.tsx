@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import styles from "./AppShell.module.css";
 
-type IconName = "notes" | "expense" | "income" | "movement" | "trip" | "calculator";
+type IconName = "notes" | "expense" | "income" | "movement" | "trip" | "calculator" | "collection";
 
 type NavItem = {
   href: string;
@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
   { href: "/tools-movement", label: "Tools Movement", mobileLabel: "Moving", icon: "movement" },
   { href: "/trip-cash", label: "Trip Cash", mobileLabel: "Trip Cash", icon: "trip" },
   { href: "/rental-calculator", label: "Rental Calculator", mobileLabel: "Calculator", icon: "calculator" },
+  { href: "/rental-collection", label: "Rental Collection", mobileLabel: "Collection", icon: "collection" },
 ];
 
 function NavIcon({ name }: { name: IconName }) {
@@ -38,6 +39,9 @@ function NavIcon({ name }: { name: IconName }) {
   }
   if (name === "trip") {
     return <svg viewBox="0 0 24 24"><path d="M3 16V8a2 2 0 0 1 2-2h10l4 4h2v6"/><circle cx="7" cy="17" r="2"/><circle cx="18" cy="17" r="2"/><path d="M9 17h7M15 6v4h4"/></svg>;
+  }
+  if (name === "collection") {
+    return <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 14h3M15 14h2"/><circle cx="17.5" cy="7" r="1"/></svg>;
   }
   return <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h2m4 0h2"/></svg>;
 }
