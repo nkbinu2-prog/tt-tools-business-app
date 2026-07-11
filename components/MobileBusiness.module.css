@@ -1820,3 +1820,1740 @@
     font-size: 8.5px !important;
   }
 }
+
+
+/* ===========================
+   GOOGLE KEEP-STYLE CHECKLIST
+=========================== */
+
+.keepScreen {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  padding-top: 4px;
+}
+
+.keepPinnedLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 4px 7px;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.keepPinnedLabel svg {
+  color: #9ca3af;
+}
+
+.keepCard {
+  position: relative;
+  overflow: visible;
+  border: 1px solid #d7dce2;
+  border-radius: 11px;
+  padding: 14px 14px 8px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.12),
+    0 2px 6px rgba(15, 23, 42, 0.12);
+}
+
+.keepTitleInput {
+  width: 100%;
+  height: auto;
+  min-height: 40px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 2px 8px;
+  background: transparent;
+  color: #202124;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.25;
+  box-shadow: none !important;
+}
+
+.keepTitleInput:focus {
+  border: 0;
+  box-shadow: none;
+}
+
+.keepSearchBox {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 9px;
+  border-radius: 8px;
+  padding: 2px 4px 2px 9px;
+  background: #f1f3f4;
+  color: #5f6368;
+}
+
+.keepSearchBox input {
+  height: 36px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+
+.keepSearchBox button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent;
+  color: #5f6368;
+}
+
+.keepAddItem {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 7px;
+  padding: 0 5px;
+  background: transparent;
+  color: #5f6368;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.keepAddItem:hover {
+  background: rgba(60, 64, 67, 0.06);
+}
+
+.keepComposer {
+  margin: 1px 0 10px;
+  border: 1px solid #dadce0;
+  border-radius: 9px;
+  padding: 9px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.keepComposerMain {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+}
+
+.keepComposerMain svg {
+  color: #5f6368;
+}
+
+.keepComposerMain input,
+.keepComposer textarea,
+.keepReminderEditor input {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+}
+
+.keepComposerMain input {
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.keepComposer textarea {
+  width: 100%;
+  min-height: 55px;
+  resize: vertical;
+  margin-top: 4px;
+  padding: 8px 29px;
+  color: #3c4043;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  outline: none;
+}
+
+.keepReminderEditor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 4px 28px 8px;
+  border-radius: 7px;
+  padding: 4px 7px;
+  background: #f1f3f4;
+}
+
+.keepReminderEditor input {
+  height: 34px;
+  min-height: 34px;
+  padding: 0 3px;
+  font-size: 11px;
+}
+
+.keepComposerActions {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.keepComposerActions button {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 6px;
+  padding: 0 9px;
+  background: transparent;
+  color: #5f6368;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.keepComposerActions button:hover {
+  background: rgba(60, 64, 67, 0.08);
+}
+
+.keepComposerActions .keepActionActive {
+  background: #fce8e6;
+  color: #b3261e;
+}
+
+.keepComposerActions .keepSaveButton {
+  background: #b80000;
+  color: #fff;
+}
+
+.keepChecklist {
+  display: grid;
+  gap: 1px;
+}
+
+.keepChecklistRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 27px;
+  align-items: start;
+  gap: 7px;
+  min-height: 38px;
+  padding: 5px 0;
+  color: #202124;
+}
+
+.keepChecklistRow:hover {
+  border-radius: 7px;
+  background: rgba(60, 64, 67, 0.045);
+}
+
+.keepChecklistRowCompleted {
+  opacity: 0.66;
+}
+
+.keepCheckbox {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+  border: 2px solid #6f7479;
+  border-radius: 2px;
+  background: transparent;
+  color: #fff;
+}
+
+.keepCheckboxChecked {
+  border-color: #70757a;
+  background: #70757a;
+}
+
+.keepItemContent {
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  border-radius: 5px;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.keepItemTitle {
+  width: 100%;
+  color: #202124;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.keepChecklistRowCompleted .keepItemTitle,
+.keepChecklistRowCompleted .keepItemDetails {
+  text-decoration: line-through;
+}
+
+.keepItemDetails {
+  width: 100%;
+  margin-top: 1px;
+  color: #5f6368;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.keepReminderChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  border-radius: 999px;
+  padding: 4px 7px;
+  background: rgba(60, 64, 67, 0.09);
+  color: #5f6368;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.keepReminderOverdue {
+  background: #fce8e6;
+  color: #b3261e;
+}
+
+.keepRowMenuWrap,
+.keepMoreWrap {
+  position: relative;
+}
+
+.keepRowMenuButton {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent;
+  color: #80868b;
+  opacity: 0;
+}
+
+.keepChecklistRow:hover .keepRowMenuButton,
+.keepRowMenuButton:focus {
+  opacity: 1;
+}
+
+.keepRowMenu,
+.keepMoreMenu {
+  position: absolute;
+  z-index: 80;
+  min-width: 128px;
+  overflow: hidden;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(60, 64, 67, 0.22);
+}
+
+.keepRowMenu {
+  top: 27px;
+  right: 0;
+}
+
+.keepRowMenu button,
+.keepMoreMenu button {
+  width: 100%;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  background: #fff;
+  color: #3c4043;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.keepRowMenu button:hover,
+.keepMoreMenu button:hover {
+  background: #f1f3f4;
+}
+
+.keepEmptyText {
+  padding: 18px 5px;
+  color: #80868b;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.keepCompletedSection {
+  margin-top: 8px;
+  border-top: 1px solid rgba(60, 64, 67, 0.18);
+  padding-top: 9px;
+}
+
+.keepCompletedToggle {
+  min-height: 32px;
+  border-radius: 6px;
+  padding: 0 2px;
+  background: transparent;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.keepCompletedList {
+  display: grid;
+  margin-top: 4px;
+}
+
+.keepToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px -4px -2px;
+  border-top: 1px solid rgba(60, 64, 67, 0.08);
+  padding-top: 8px;
+}
+
+.keepToolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.keepToolbar button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent;
+  color: #80868b;
+}
+
+.keepToolbar button:hover:not(:disabled) {
+  background: rgba(60, 64, 67, 0.08);
+}
+
+.keepToolbar button:disabled {
+  opacity: 0.48;
+}
+
+.keepMoreMenu {
+  right: 0;
+  bottom: 38px;
+}
+
+.keepMoreMenu button {
+  width: auto;
+  min-width: 150px;
+}
+
+.keepPalette {
+  position: absolute;
+  left: 10px;
+  bottom: 49px;
+  z-index: 70;
+  display: flex;
+  gap: 7px;
+  border: 1px solid #dadce0;
+  border-radius: 999px;
+  padding: 7px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(60, 64, 67, 0.2);
+}
+
+.keepPaletteColor {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #c7c9cc;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.keepPaletteSelected {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px #b80000;
+}
+
+@media (max-width: 760px) {
+  .keepScreen {
+    width: 100%;
+    padding: 1px 4px 8px;
+  }
+
+  .keepCard {
+    border-radius: 10px;
+    padding: 13px 12px 7px;
+  }
+
+  .keepTitleInput {
+    font-size: 20px;
+  }
+
+  .keepItemTitle {
+    font-size: 13px;
+  }
+
+  .keepRowMenuButton {
+    opacity: 1;
+  }
+}
+
+
+/* Google Keep-style overflow menu */
+.keepLabelChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  margin: -2px 0 8px 2px;
+  border-radius: 999px;
+  padding: 0 9px;
+  background: rgba(60, 64, 67, 0.1);
+  color: #5f6368;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.keepChecklistRowNoCheckbox {
+  grid-template-columns: minmax(0, 1fr) 27px;
+}
+
+.keepMoreMenuExact {
+  right: 0;
+  bottom: 38px;
+  min-width: 172px;
+  border-radius: 4px;
+  padding: 6px 0;
+}
+
+.keepMoreMenuExact button {
+  min-width: 172px;
+  min-height: 32px;
+  justify-content: flex-start;
+  padding: 0 17px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.keepMoreMenuExact button:disabled {
+  color: #a9adb1;
+  opacity: 1;
+}
+
+
+/* ===========================
+   REFINED KEEP CARD + MENU
+=========================== */
+
+.keepCard button {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.keepCard {
+  border-color: #e2e5e9;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 10px 28px rgba(15, 23, 42, 0.09);
+}
+
+.keepAddItem {
+  min-height: 42px;
+  margin: 2px 0 5px;
+  border-radius: 10px;
+  padding: 0 10px;
+  background: #f7f8fa;
+  color: #4b5563;
+}
+
+.keepAddItem:hover {
+  background: #eef1f4;
+  color: #202124;
+}
+
+.keepCompletedToggle {
+  min-height: 34px;
+  padding: 0 4px;
+  color: #5f6368;
+  background: transparent;
+  font-weight: 600;
+}
+
+.keepToolbar {
+  margin-top: 13px;
+  padding-top: 9px;
+}
+
+.keepToolbar button {
+  border: 0 !important;
+  background: transparent;
+  box-shadow: none !important;
+}
+
+.keepToolbar button:hover:not(:disabled),
+.keepToolbar button:focus-visible {
+  background: #f1f3f4;
+  color: #3c4043;
+}
+
+.keepMoreMenuExact {
+  right: -2px;
+  bottom: 45px;
+  width: 220px;
+  min-width: 220px;
+  overflow: visible;
+  border: 1px solid #e3e6ea;
+  border-radius: 14px;
+  padding: 7px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.17),
+    0 3px 10px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.keepMoreMenuExact::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: -6px;
+  width: 11px;
+  height: 11px;
+  border-right: 1px solid #e3e6ea;
+  border-bottom: 1px solid #e3e6ea;
+  background: #ffffff;
+  transform: rotate(45deg);
+}
+
+.keepMoreMenuExact button {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  justify-content: flex-start;
+  border: 0 !important;
+  border-radius: 9px !important;
+  padding: 0 12px;
+  background: transparent;
+  color: #3f4650;
+  box-shadow: none !important;
+  outline: none !important;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.keepMoreMenuExact button:hover:not(:disabled),
+.keepMoreMenuExact button:focus-visible {
+  background: #f3f5f7;
+  color: #171a1f;
+}
+
+.keepMoreMenuExact button:first-child {
+  color: #b42318;
+}
+
+.keepMoreMenuExact button:first-child:hover {
+  background: #fff0ef;
+  color: #9f1c13;
+}
+
+.keepMoreMenuExact button:nth-child(5),
+.keepMoreMenuExact button:nth-child(8) {
+  margin-top: 6px;
+  box-shadow: inset 0 1px 0 #eceff2 !important;
+}
+
+.keepMoreMenuExact button:disabled {
+  background: transparent;
+  color: #b4b8be;
+  opacity: 1;
+}
+
+.keepRowMenuButton {
+  border: 0 !important;
+}
+
+.keepCheckbox {
+  box-shadow: none !important;
+}
+
+@media (max-width: 760px) {
+  .keepCard {
+    border-radius: 14px;
+  }
+
+  .keepMoreMenuExact {
+    right: -3px;
+    bottom: 45px;
+    width: min(220px, calc(100vw - 34px));
+    min-width: 0;
+  }
+
+  .keepMoreMenuExact button {
+    min-height: 40px;
+    font-size: 13px;
+  }
+}
+
+
+/* ===========================
+   MULTI-NOTE KEEP-STYLE BOARD
+=========================== */
+
+.boardScreen {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.boardTopbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.boardSearch {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  min-height: 46px;
+  border: 1px solid #e1e5e9;
+  border-radius: 14px;
+  padding: 0 12px;
+  background: #fff;
+  color: #7b828a;
+  box-shadow: 0 4px 14px rgba(31, 41, 55, 0.05);
+}
+
+.boardSearch > span {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.boardSearch input {
+  height: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+
+.boardNewButton,
+.boardAlertButton {
+  min-height: 46px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boardNewButton {
+  background: linear-gradient(135deg, #d90000, #930000);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(145, 0, 0, 0.18);
+}
+
+.boardAlertButton {
+  background: #fff3c4;
+  color: #7b3100;
+}
+
+.boardSection {
+  margin-top: 15px;
+}
+
+.boardSectionTitle {
+  margin: 0 5px 9px;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.boardMasonry {
+  columns: 4 260px;
+  column-gap: 14px;
+}
+
+.boardNoteCard {
+  position: relative;
+  width: 100%;
+  display: inline-block;
+  break-inside: avoid;
+  margin: 0 0 14px;
+  border: 1px solid rgba(90, 96, 104, 0.22);
+  border-radius: 12px;
+  padding: 13px 14px 9px;
+  background: #fff;
+  color: #202124;
+  box-shadow: 0 2px 7px rgba(31, 41, 55, 0.045);
+  vertical-align: top;
+}
+
+.boardNoteCard:hover {
+  box-shadow:
+    0 2px 5px rgba(31, 41, 55, 0.08),
+    0 9px 24px rgba(31, 41, 55, 0.09);
+}
+
+.boardNoteHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 7px;
+  margin-bottom: 5px;
+}
+
+.boardNoteTitle {
+  width: 100%;
+  height: auto;
+  min-height: 34px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: #202124;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+  box-shadow: none !important;
+}
+
+.boardNoteTitle::placeholder {
+  color: #8b9096;
+}
+
+.boardHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.boardPinButton,
+.boardMoreButton,
+.boardFooterActions button {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #737980;
+  font: inherit;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.boardPinButton:hover,
+.boardMoreButton:hover,
+.boardFooterActions button:hover {
+  background: rgba(60, 64, 67, 0.08);
+}
+
+.boardPinButton {
+  opacity: 0.45;
+  font-size: 14px;
+}
+
+.boardPinActive {
+  opacity: 1;
+  background: rgba(60, 64, 67, 0.08);
+}
+
+.boardMenuWrap {
+  position: relative;
+}
+
+.boardMenu {
+  position: absolute;
+  top: 33px;
+  right: 0;
+  z-index: 90;
+  width: 176px;
+  overflow: hidden;
+  border: 1px solid #e2e5e9;
+  border-radius: 11px;
+  padding: 6px;
+  background: #fff;
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.17),
+    0 3px 9px rgba(15, 23, 42, 0.08);
+}
+
+.boardMenu button {
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-radius: 7px;
+  padding: 0 10px;
+  background: transparent;
+  color: #3f4650;
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.boardMenu button:hover {
+  background: #f2f4f6;
+}
+
+.boardMenu .boardDeleteMenuItem {
+  color: #b42318;
+}
+
+.boardMenu .boardDeleteMenuItem:hover {
+  background: #fff0ef;
+}
+
+.boardChecklist {
+  display: grid;
+  gap: 1px;
+}
+
+.boardChecklistRow {
+  display: grid;
+  grid-template-columns: 21px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  min-height: 31px;
+  padding: 2px 0;
+}
+
+.boardCheckbox {
+  width: 15px;
+  height: 15px;
+  display: grid;
+  place-items: center;
+  margin: 6px 0 0 1px;
+  border: 2px solid #6e7479;
+  border-radius: 2px;
+  padding: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.boardCheckboxDone {
+  border-color: #71767c;
+  background: #71767c;
+}
+
+.boardChecklistRow input {
+  width: 100%;
+  height: auto;
+  min-height: 29px;
+  border: 0;
+  border-radius: 0;
+  padding: 3px 0 4px;
+  background: transparent;
+  color: #202124;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.42;
+  box-shadow: none !important;
+}
+
+.boardChecklistRow input::placeholder {
+  color: #9aa0a6;
+  font-weight: 400;
+}
+
+.boardCompletedGroup {
+  margin-top: 7px;
+  border-top: 1px solid rgba(60, 64, 67, 0.16);
+  padding-top: 7px;
+}
+
+.boardChecklistRowDone {
+  opacity: 0.62;
+}
+
+.boardChecklistRowDone input {
+  text-decoration: line-through;
+}
+
+.boardPlainText {
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  border: 0;
+  border-radius: 0;
+  padding: 3px 0 5px;
+  background: transparent;
+  color: #202124;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  outline: none;
+}
+
+.boardReminderEditor {
+  display: grid;
+  grid-template-columns: 1fr 0.78fr auto auto;
+  gap: 5px;
+  margin-top: 9px;
+  border-radius: 9px;
+  padding: 7px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.boardReminderEditor input {
+  min-width: 0;
+  height: 34px;
+  min-height: 34px;
+  border-radius: 7px;
+  padding: 0 6px;
+  font-size: 10px;
+}
+
+.boardReminderEditor button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 7px;
+  padding: 0 8px;
+  background: #8e0000;
+  color: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boardReminderEditor button:last-child {
+  background: #eceff2;
+  color: #4b5563;
+}
+
+.boardNoteFooter {
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  margin: 9px -4px -3px;
+  border-top: 1px solid rgba(60, 64, 67, 0.07);
+  padding-top: 6px;
+}
+
+.boardFooterLeft {
+  min-width: 0;
+}
+
+.boardReminderChip {
+  max-width: 100%;
+  min-height: 25px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 8px;
+  background: rgba(60, 64, 67, 0.09);
+  color: #5f6368;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boardReminderOverdue {
+  background: #fce8e6;
+  color: #b3261e;
+}
+
+.boardFooterActions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.boardPalette {
+  position: absolute;
+  right: 8px;
+  bottom: 43px;
+  z-index: 80;
+  display: flex;
+  gap: 6px;
+  border: 1px solid #dadde1;
+  border-radius: 999px;
+  padding: 6px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(31, 41, 55, 0.17);
+}
+
+.boardPaletteColor {
+  width: 23px;
+  height: 23px;
+  border: 1px solid #bfc4ca;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+}
+
+.boardPaletteSelected {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px #a50000;
+}
+
+.boardEmpty {
+  width: min(100%, 520px);
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  margin: 40px auto;
+  border: 1px dashed #cfd4da;
+  border-radius: 18px;
+  padding: 20px;
+  background: #fff;
+  color: #4b5563;
+  text-align: center;
+  font: inherit;
+  cursor: pointer;
+}
+
+.boardEmpty strong {
+  font-size: 17px;
+}
+
+.boardEmpty span {
+  color: #7a818a;
+  font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+  .boardMasonry {
+    columns: 3 250px;
+  }
+}
+
+@media (max-width: 760px) {
+  .boardTopbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .boardAlertButton {
+    grid-column: 1 / -1;
+    min-height: 40px;
+  }
+
+  .boardMasonry {
+    columns: 2 220px;
+    column-gap: 9px;
+  }
+
+  .boardNoteCard {
+    margin-bottom: 9px;
+    border-radius: 11px;
+    padding: 12px 12px 8px;
+  }
+
+  .boardReminderEditor {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .boardTopbar {
+    grid-template-columns: 1fr;
+  }
+
+  .boardNewButton,
+  .boardAlertButton {
+    width: 100%;
+  }
+
+  .boardMasonry {
+    columns: 1;
+  }
+
+  .boardNoteTitle {
+    font-size: 17px;
+  }
+
+  .boardChecklistRow input,
+  .boardPlainText {
+    font-size: 13px;
+  }
+}
+
+
+/* ===========================
+   INCOME & EXPENSE TOGGLE
+=========================== */
+
+.moneyTrackerPage {
+  width: min(100%, 980px);
+  margin: 0 auto;
+}
+
+.moneyTrackerToggleCard {
+  margin-bottom: 14px;
+  border: 1px solid #e1e5ea;
+  border-radius: 18px;
+  padding: 8px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(31, 41, 55, 0.06);
+}
+
+.moneyTrackerToggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  border-radius: 14px;
+  padding: 4px;
+  background: #f1f3f6;
+}
+
+.moneyTrackerToggleButton {
+  min-width: 0;
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #646b75;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.moneyTrackerToggleButton:hover {
+  background: rgba(255, 255, 255, 0.72);
+  color: #252a31;
+}
+
+.moneyTrackerToggleButton:active {
+  transform: scale(0.985);
+}
+
+.moneyTrackerToggleIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #fff;
+  color: #5f6670;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(31, 41, 55, 0.08);
+}
+
+.moneyTrackerToggleButton span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.moneyTrackerToggleButton strong {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.moneyTrackerToggleButton small {
+  overflow: hidden;
+  color: inherit;
+  opacity: 0.72;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.moneyTrackerToggleActive {
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(31, 41, 55, 0.14);
+}
+
+.moneyTrackerExpenseActive {
+  background: linear-gradient(135deg, #e11414, #8f0000);
+}
+
+.moneyTrackerIncomeActive {
+  background: linear-gradient(135deg, #169447, #08702f);
+}
+
+.moneyTrackerToggleActive:hover {
+  color: #fff;
+}
+
+.moneyTrackerExpenseActive:hover {
+  background: linear-gradient(135deg, #e11414, #8f0000);
+}
+
+.moneyTrackerIncomeActive:hover {
+  background: linear-gradient(135deg, #169447, #08702f);
+}
+
+.moneyTrackerToggleActive .moneyTrackerToggleIcon {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  box-shadow: none;
+}
+
+.moneyTrackerCurrentLabel {
+  margin: 7px 4px 1px;
+  border-radius: 9px;
+  padding: 7px 10px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.moneyTrackerCurrentExpense {
+  background: #fff0f0;
+  color: #a00000;
+}
+
+.moneyTrackerCurrentIncome {
+  background: #eaf8ef;
+  color: #08702f;
+}
+
+@media (max-width: 520px) {
+  .moneyTrackerToggleCard {
+    border-radius: 15px;
+    padding: 6px;
+  }
+
+  .moneyTrackerToggle {
+    gap: 5px;
+    padding: 3px;
+  }
+
+  .moneyTrackerToggleButton {
+    min-height: 60px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 7px;
+    padding: 7px;
+    border-radius: 10px;
+  }
+
+  .moneyTrackerToggleIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    font-size: 13px;
+  }
+
+  .moneyTrackerToggleButton strong {
+    font-size: 13px;
+  }
+
+  .moneyTrackerToggleButton small {
+    font-size: 8px;
+  }
+}
+
+
+/* ===========================
+   COMPACT MOBILE MONEY TRACKER
+=========================== */
+
+.compactMoneyScreen {
+  width: min(100%, 980px);
+  margin: 0 auto;
+}
+
+.compactMoneyTotals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  margin-bottom: 5px;
+  border: 1px solid #e3e6ea;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.compactMoneyTotals span {
+  min-width: 0;
+  min-height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 4px 8px;
+  color: #777e87;
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.compactMoneyTotals span + span {
+  border-left: 1px solid #e3e6ea;
+}
+
+.compactMoneyTotals b {
+  overflow: hidden;
+  color: #8d0000;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.compactMoneyForm {
+  overflow: hidden;
+  border: 1px solid #dde2e8;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.compactMoneyRowOne,
+.compactMoneyRowTwo {
+  display: grid;
+  min-width: 0;
+  background: #fff;
+}
+
+.compactMoneyRowOne {
+  grid-template-columns: minmax(0, 1.55fr) minmax(92px, 0.62fr);
+}
+
+.compactMoneyRowTwo {
+  grid-template-columns: minmax(0, 1fr) minmax(104px, 0.55fr) auto auto;
+  border-top: 1px solid #dde2e8;
+}
+
+.compactMoneyInput {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  min-height: 36px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 8px;
+  background: #fff !important;
+  color: #22272e;
+  outline: none;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+
+.compactMoneyInput::placeholder {
+  color: #8b9199;
+  opacity: 1;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.compactMoneyRowOne > * + *,
+.compactMoneyRowTwo > * + * {
+  border-left: 1px solid #dde2e8 !important;
+}
+
+.compactAmountInput {
+  color: #8c0000;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.compactDateInput {
+  padding-right: 3px;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.compactIncomeModes {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: #fff;
+}
+
+.compactIncomeModes button {
+  min-width: 0;
+  min-height: 36px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 2px;
+  background: #fff;
+  color: #666d76;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.compactIncomeModes button + button {
+  border-left: 1px solid #e3e6ea;
+}
+
+.compactIncomeModes .compactIncomeModeActive {
+  background: #eaf7ef;
+  color: #08702f;
+  font-weight: 700;
+}
+
+.compactSaveButton,
+.compactCancelButton {
+  min-width: 47px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 7px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.compactSaveButton {
+  background: linear-gradient(135deg, #d50000, #930000);
+  color: #fff;
+}
+
+.compactMoneyRowTwo .compactCancelButton {
+  min-width: 34px;
+  background: #f0f2f4;
+  color: #626970;
+  font-size: 16px;
+}
+
+.compactMoneyTools {
+  display: grid;
+  grid-template-columns: auto minmax(90px, 1fr);
+  gap: 5px;
+  align-items: center;
+  margin: 6px 0 3px;
+}
+
+.compactMoneyFilters {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid #e0e4e9;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.compactMoneyFilters button {
+  min-height: 28px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 8px;
+  background: #fff;
+  color: #6c737c;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.compactMoneyFilters button + button {
+  border-left: 1px solid #e5e8ec;
+}
+
+.compactMoneyFilters .compactFilterActive {
+  background: #ffdf55;
+  color: #720000;
+  font-weight: 700;
+}
+
+.compactMoneySearch {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  min-height: 28px;
+  border: 1px solid #e0e4e9;
+  border-radius: 8px;
+  padding: 0 8px;
+  background: #fff;
+  color: #252a31;
+  outline: none;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.compactMoneyList {
+  overflow: hidden;
+  border: 1px solid #e2e5e9;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.compactMoneyLine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 27px;
+  align-items: center;
+  gap: 5px;
+  min-height: 41px;
+  padding: 4px 4px 4px 8px;
+  background: #fff;
+}
+
+.compactMoneyLine + .compactMoneyLine {
+  border-top: 1px solid #e5e8ec;
+}
+
+.compactMoneyMain {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #252a31;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.compactMoneyMain strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.compactMoneyMain span {
+  overflow: hidden;
+  color: #80868e;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 400;
+}
+
+.compactMoneyAmount {
+  color: #970000;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.compactIncomeAmount {
+  color: #08752f;
+}
+
+.compactDeleteButton {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #a0a5ac;
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.compactDeleteButton:hover {
+  background: #fff0f0;
+  color: #bc0000;
+}
+
+.compactMoneyEmpty {
+  padding: 18px 8px;
+  border: 1px dashed #d5dae0;
+  border-radius: 9px;
+  background: #fff;
+  color: #858b93;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+@media (max-width: 430px) {
+  .compactMoneyTotals span {
+    min-height: 27px;
+    padding-inline: 6px;
+    font-size: 7px;
+  }
+
+  .compactMoneyTotals b {
+    font-size: 11px;
+  }
+
+  .compactMoneyInput,
+  .compactIncomeModes button,
+  .compactSaveButton,
+  .compactCancelButton {
+    height: 34px;
+    min-height: 34px;
+  }
+
+  .compactMoneyInput,
+  .compactMoneyInput::placeholder {
+    font-size: 9px;
+  }
+
+  .compactAmountInput {
+    font-size: 11px;
+  }
+
+  .compactIncomeModes button {
+    font-size: 7px;
+  }
+
+  .compactDateInput {
+    font-size: 8px;
+  }
+
+  .compactSaveButton {
+    min-width: 43px;
+    font-size: 8px;
+  }
+
+  .compactMoneyRowTwo .compactCancelButton {
+    min-width: 31px;
+  }
+
+  .compactMoneyFilters button {
+    padding-inline: 6px;
+    font-size: 7px;
+  }
+
+  .compactMoneySearch {
+    font-size: 8px;
+  }
+}

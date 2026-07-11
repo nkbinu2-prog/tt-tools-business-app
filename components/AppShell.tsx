@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import styles from "./AppShell.module.css";
 
-type IconName = "notes" | "expense" | "income" | "movement" | "trip" | "calculator" | "collection";
+type IconName = "notes" | "money" | "movement" | "trip" | "calculator" | "collection";
 
 type NavItem = {
   href: string;
@@ -16,8 +16,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: "/reminders", label: "Notes & Reminders", mobileLabel: "Notes", icon: "notes" },
-  { href: "/expenses", label: "Expense Tracker", mobileLabel: "Expense", icon: "expense" },
-  { href: "/income", label: "Income Tracker", mobileLabel: "Income", icon: "income" },
+  { href: "/expenses", label: "Income & Expenses", mobileLabel: "Money", icon: "money" },
   { href: "/tools-movement", label: "Tools Movement", mobileLabel: "Moving", icon: "movement" },
   { href: "/trip-cash", label: "Trip Cash", mobileLabel: "Trip Cash", icon: "trip" },
   { href: "/rental-calculator", label: "Rental Calculator", mobileLabel: "Calculator", icon: "calculator" },
@@ -28,11 +27,8 @@ function NavIcon({ name }: { name: IconName }) {
   if (name === "notes") {
     return <svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>;
   }
-  if (name === "expense") {
-    return <svg viewBox="0 0 24 24"><path d="M12 3v18M17 7.5c0-1.7-2.2-3-5-3s-5 1.3-5 3 2.2 3 5 3 5 1.3 5 3-2.2 3-5 3-5-1.3-5-3"/><path d="m18 18 3 3m0-3-3 3"/></svg>;
-  }
-  if (name === "income") {
-    return <svg viewBox="0 0 24 24"><path d="M12 3v18M17 7.5c0-1.7-2.2-3-5-3s-5 1.3-5 3 2.2 3 5 3 5 1.3 5 3-2.2 3-5 3-5-1.3-5-3"/><path d="m18 19 2 2 3-4"/></svg>;
+  if (name === "money") {
+    return <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 15h10"/><path d="m8 12 2-2 2 2"/><path d="m16 12-2 2-2-2"/></svg>;
   }
   if (name === "movement") {
     return <svg viewBox="0 0 24 24"><path d="M3 7h12"/><path d="m12 4 3 3-3 3"/><path d="M21 17H9"/><path d="m12 14-3 3 3 3"/><circle cx="5" cy="17" r="2"/><circle cx="19" cy="7" r="2"/></svg>;
