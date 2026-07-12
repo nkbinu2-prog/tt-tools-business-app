@@ -324,7 +324,26 @@ export default function TripCashPage() {
 
       <style jsx global>{`
         .trip-cash-compact {
-          font-size: 10px;
+          font-weight: 600;
+          font-size: 12px;
+        }
+
+        .trip-cash-compact input,
+        .trip-cash-compact textarea,
+        .trip-cash-compact select,
+        .trip-cash-compact button {
+          font-weight: 650 !important;
+        }
+
+        .trip-cash-compact .tc-summary-label,
+        .trip-cash-compact .tc-summary-value,
+        .trip-cash-compact .tc-label,
+        .trip-cash-compact .tc-record-name,
+        .trip-cash-compact .tc-record-place,
+        .trip-cash-compact .tc-record-meta,
+        .trip-cash-compact .tc-record-status,
+        .trip-cash-compact .tc-record-amount {
+          font-weight: 700 !important;
         }
 
         .trip-cash-compact .tc-summary-grid {
@@ -340,13 +359,13 @@ export default function TripCashPage() {
         }
 
         .trip-cash-compact .tc-summary-label {
-          font-size: 7.5px !important;
+          font-size: 9px !important;
           line-height: 1 !important;
         }
 
         .trip-cash-compact .tc-summary-value {
           margin-top: 3px !important;
-          font-size: 17px !important;
+          font-size: 20.4px !important;
           line-height: 1 !important;
         }
 
@@ -362,7 +381,7 @@ export default function TripCashPage() {
 
         .trip-cash-compact .tc-label {
           margin-bottom: 3px !important;
-          font-size: 8.5px !important;
+          font-size: 10.2px !important;
           line-height: 1.1 !important;
         }
 
@@ -372,7 +391,7 @@ export default function TripCashPage() {
           height: 31px !important;
           border-radius: 6px !important;
           padding: 0 7px !important;
-          font-size: 10px !important;
+          font-size: 12px !important;
         }
 
         .trip-cash-compact .tc-amount-input {
@@ -380,7 +399,7 @@ export default function TripCashPage() {
           height: 37px !important;
           border-radius: 7px !important;
           padding: 0 8px !important;
-          font-size: 19px !important;
+          font-size: 22.8px !important;
         }
 
         .trip-cash-compact .tc-textarea {
@@ -389,7 +408,7 @@ export default function TripCashPage() {
           resize: none !important;
           border-radius: 6px !important;
           padding: 6px 7px !important;
-          font-size: 10px !important;
+          font-size: 12px !important;
           line-height: 1.15 !important;
         }
 
@@ -398,13 +417,13 @@ export default function TripCashPage() {
           width: 31px !important;
           min-height: 31px !important;
           height: 31px !important;
-          font-size: 15px !important;
+          font-size: 18px !important;
         }
 
         .trip-cash-compact .tc-qty-value {
           min-height: 31px !important;
           height: 31px !important;
-          font-size: 14px !important;
+          font-size: 16.8px !important;
           line-height: 31px !important;
         }
 
@@ -413,7 +432,7 @@ export default function TripCashPage() {
           height: 31px !important;
           border-radius: 6px !important;
           padding: 0 8px !important;
-          font-size: 9px !important;
+          font-size: 10.8px !important;
         }
 
         .trip-cash-compact .tc-composer-tools {
@@ -443,7 +462,7 @@ export default function TripCashPage() {
           height: 29px !important;
           border-radius: 6px !important;
           padding: 0 6px !important;
-          font-size: 8px !important;
+          font-size: 9.6px !important;
         }
 
         .trip-cash-compact .tc-search-input {
@@ -452,12 +471,12 @@ export default function TripCashPage() {
           height: 29px !important;
           border-radius: 6px !important;
           padding: 0 7px !important;
-          font-size: 9px !important;
+          font-size: 10.8px !important;
         }
 
         .trip-cash-compact .tc-empty {
           padding: 14px 6px !important;
-          font-size: 9px !important;
+          font-size: 10.8px !important;
         }
 
         .trip-cash-compact .tc-record-list {
@@ -509,19 +528,19 @@ export default function TripCashPage() {
 
         .trip-cash-compact .tc-record-name {
           color: #111827;
-          font-size: 9.5px;
+          font-size: 11.4px;
           font-weight: 800;
         }
 
         .trip-cash-compact .tc-record-place,
         .trip-cash-compact .tc-record-meta {
           color: #5b6472;
-          font-size: 7.8px;
+          font-size: 9.36px;
           font-weight: 500;
         }
 
         .trip-cash-compact .tc-record-status {
-          font-size: 7px;
+          font-size: 8.4px;
           font-weight: 800;
           white-space: nowrap;
         }
@@ -536,7 +555,7 @@ export default function TripCashPage() {
 
         .trip-cash-compact .tc-record-amount {
           color: #111827;
-          font-size: 10.5px;
+          font-size: 12.6px;
           font-weight: 900;
           white-space: nowrap;
         }
@@ -555,7 +574,7 @@ export default function TripCashPage() {
           background: #f1f3f6;
           color: #374151;
           padding: 0 5px;
-          font-size: 7px;
+          font-size: 8.4px;
           font-weight: 800;
           white-space: nowrap;
           cursor: pointer;
@@ -598,17 +617,17 @@ export default function TripCashPage() {
           }
 
           .trip-cash-compact .tc-record-name {
-            font-size: 9px;
+            font-size: 10.8px;
           }
 
           .trip-cash-compact .tc-record-place,
           .trip-cash-compact .tc-record-meta {
-            font-size: 7.3px;
+            font-size: 8.76px;
           }
 
           .trip-cash-compact .tc-record-button {
             padding: 0 4px;
-            font-size: 6.6px;
+            font-size: 7.92px;
           }
         }
       `}</style>

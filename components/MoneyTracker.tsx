@@ -413,7 +413,23 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
 
       <style jsx global>{`
         .money-tracker-compact {
-          font-size: 11px;
+          font-weight: 600;
+          font-size: 13.2px;
+        }
+
+        .money-tracker-compact input,
+        .money-tracker-compact textarea,
+        .money-tracker-compact select,
+        .money-tracker-compact button {
+          font-weight: 650 !important;
+        }
+
+        .money-tracker-compact .mt-entry-text,
+        .money-tracker-compact .mt-entry-amount,
+        .money-tracker-compact .mt-summary-label,
+        .money-tracker-compact .mt-summary-value,
+        .money-tracker-compact .mt-label {
+          font-weight: 700 !important;
         }
 
         .money-tracker-compact .mt-summary-row {
@@ -429,13 +445,13 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
         }
 
         .money-tracker-compact .mt-summary-label {
-          font-size: 8px !important;
+          font-size: 9.6px !important;
           line-height: 1 !important;
         }
 
         .money-tracker-compact .mt-summary-value {
           margin-top: 3px !important;
-          font-size: 19px !important;
+          font-size: 22.8px !important;
           line-height: 1 !important;
         }
 
@@ -455,7 +471,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
 
         .money-tracker-compact .mt-label {
           margin-bottom: 3px !important;
-          font-size: 9px !important;
+          font-size: 10.8px !important;
           line-height: 1.1 !important;
         }
 
@@ -465,7 +481,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           height: 32px !important;
           border-radius: 7px !important;
           padding: 0 8px !important;
-          font-size: 11px !important;
+          font-size: 13.2px !important;
         }
 
         .money-tracker-compact .mt-textarea {
@@ -474,7 +490,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           resize: none !important;
           border-radius: 7px !important;
           padding: 7px 8px !important;
-          font-size: 11px !important;
+          font-size: 13.2px !important;
           line-height: 1.2 !important;
         }
 
@@ -483,7 +499,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           height: 38px !important;
           border-radius: 7px !important;
           padding: 0 9px !important;
-          font-size: 20px !important;
+          font-size: 24px !important;
         }
 
         .money-tracker-compact .mt-mode-buttons {
@@ -497,7 +513,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           height: 32px !important;
           border-radius: 7px !important;
           padding: 0 4px !important;
-          font-size: 9px !important;
+          font-size: 10.8px !important;
           white-space: nowrap !important;
         }
 
@@ -510,7 +526,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           height: 32px !important;
           border-radius: 7px !important;
           padding: 0 10px !important;
-          font-size: 10px !important;
+          font-size: 12px !important;
         }
 
         .money-tracker-compact .mt-composer-tools {
@@ -540,7 +556,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           height: 30px !important;
           border-radius: 6px !important;
           padding: 0 7px !important;
-          font-size: 9px !important;
+          font-size: 10.8px !important;
         }
 
         .money-tracker-compact .mt-search-input {
@@ -549,12 +565,12 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           height: 30px !important;
           border-radius: 6px !important;
           padding: 0 7px !important;
-          font-size: 10px !important;
+          font-size: 12px !important;
         }
 
         .money-tracker-compact .mt-empty {
           padding: 14px 6px !important;
-          font-size: 10px !important;
+          font-size: 12px !important;
         }
 
         .money-tracker-compact .mt-entry-list {
@@ -578,7 +594,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           min-width: 0;
           overflow: hidden;
           color: #374151;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 500;
           line-height: 1.2;
           text-overflow: ellipsis;
@@ -587,7 +603,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
 
         .money-tracker-compact .mt-entry-amount {
           color: #8d0000;
-          font-size: 11px;
+          font-size: 13.2px;
           font-weight: 800;
           white-space: nowrap;
         }
@@ -604,7 +620,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           border-radius: 5px;
           padding: 0 6px;
           font: inherit;
-          font-size: 8px;
+          font-size: 9.6px;
           font-weight: 700;
           cursor: pointer;
         }
@@ -634,13 +650,13 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           }
 
           .money-tracker-compact .mt-entry-text {
-            font-size: 8.5px;
+            font-size: 10.2px;
           }
 
           .money-tracker-compact .mt-entry-action,
           .money-tracker-compact .mt-entry-delete {
             padding: 0 4px;
-            font-size: 7.5px;
+            font-size: 9px;
           }
         }
       `}</style>

@@ -220,9 +220,9 @@ export default function ToolsMovementPage() {
 
   return (
     <AppShell title="Tools Movement" subtitle="Enter tools quickly, then move each one through four stops">
-      <div className={ui.screen}>
+      <div className={`${ui.screen} tools-movement-font-120`}>
         <div className={ui.movementTopActions}>
-          <button type="button" className={ui.drawerOpenButton} onClick={() => setShowDrawer(true)}>
+          <button type="button" className={`${ui.drawerOpenButton} tm-drawer-open`} onClick={() => setShowDrawer(true)}>
             Active Movements <span>{activeItems.length}</span>
           </button>
         </div>
@@ -230,8 +230,8 @@ export default function ToolsMovementPage() {
         <form className={`${ui.panel} ${ui.movementEntryPanel}`} onSubmit={startMovements}>
           <div className={ui.movementHeader}>
             <div>
-              <h2>Start Moving Tools</h2>
-              <p>Tool, From and Note only. The first stage starts automatically.</p>
+              <h2 className="tm-heading">Start Moving Tools</h2>
+              <p className="tm-subtext">Tool, From and Note only. The first stage starts automatically.</p>
             </div>
           </div>
 
@@ -240,13 +240,13 @@ export default function ToolsMovementPage() {
               <div className={ui.movementEntryRow} key={row.id}>
                 <div className={ui.rowNumber}>{index + 1}</div>
                 <input
-                  className={`${ui.field} ${ui.movementToolField}`}
+                  className={`${ui.field} ${ui.movementToolField} tm-entry-field`}
                   value={row.tool}
                   onChange={(event) => updateRow(row.id, { tool: event.target.value })}
                   placeholder="Tool"
                 />
                 <select
-                  className={`${ui.select} ${ui.movementFromField}`}
+                  className={`${ui.select} ${ui.movementFromField} tm-entry-field`}
                   value={row.homeShop}
                   onChange={(event) => updateRow(row.id, { homeShop: event.target.value })}
                   aria-label={`From location for row ${index + 1}`}
@@ -254,7 +254,7 @@ export default function ToolsMovementPage() {
                   {MOVEMENT_DESTINATIONS.map((location) => <option key={location}>{location}</option>)}
                 </select>
                 <input
-                  className={`${ui.field} ${ui.movementNoteField}`}
+                  className={`${ui.field} ${ui.movementNoteField} tm-entry-field`}
                   value={row.notes}
                   onChange={(event) => updateRow(row.id, { notes: event.target.value })}
                   placeholder="Note"
@@ -263,17 +263,17 @@ export default function ToolsMovementPage() {
             ))}
           </div>
 
-          <button type="button" className={ui.addRowsButton} onClick={() => setRows((current) => [...current, ...makeRows()])}>+ Add 8 Rows</button>
-          <button type="submit" className={ui.startMovementButton}>Start Movement</button>
+          <button type="button" className={`${ui.addRowsButton} tm-main-action`} onClick={() => setRows((current) => [...current, ...makeRows()])}>+ Add 8 Rows</button>
+          <button type="submit" className={`${ui.startMovementButton} tm-main-action`}>Start Movement</button>
         </form>
 
         <div className={ui.sectionBar}>
           <div className={ui.filterButtons}>
             {(["Active", "Completed", "All"] as const).map((name) => (
-              <button key={name} type="button" className={`${ui.filterButton} ${historyFilter === name ? ui.filterButtonActive : ""}`} onClick={() => setHistoryFilter(name)}>{name}</button>
+              <button key={name} type="button" className={`${ui.filterButton} tm-filter-button ${historyFilter === name ? ui.filterButtonActive : ""}`} onClick={() => setHistoryFilter(name)}>{name}</button>
             ))}
           </div>
-          <input className={ui.searchInput} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tool or location" />
+          <input className={`${ui.searchInput} tm-search-input`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tool or location" />
         </div>
 
         {visibleHistory.length === 0 ? (
@@ -331,7 +331,7 @@ export default function ToolsMovementPage() {
 
       {showDrawer ? (
         <div className={ui.drawerBackdrop} onMouseDown={(event) => event.target === event.currentTarget && setShowDrawer(false)}>
-          <section className={ui.activeDrawer} aria-label="Active movement drawer">
+          <section className={`${ui.activeDrawer} tm-drawer`} aria-label="Active movement drawer">
             <div className={ui.drawerHandle} />
             <div className={ui.drawerHeader}>
               <div>
@@ -364,12 +364,12 @@ export default function ToolsMovementPage() {
                         <button
                           key={step}
                           type="button"
-                          className={`${ui.drawerStageButton} ${isPast ? ui.drawerStagePast : ""} ${isCurrent ? ui.drawerStageCurrent : ""} ${isNext ? ui.drawerStageNext : ""} ${isFuture ? ui.drawerStageFuture : ""}`}
+                          className={`${ui.drawerStageButton} tm-stage-button ${isPast ? ui.drawerStagePast : ""} ${isCurrent ? ui.drawerStageCurrent : ""} ${isNext ? ui.drawerStageNext : ""} ${isFuture ? ui.drawerStageFuture : ""}`}
                           disabled={isFuture}
                           onClick={() => openStage(record, step)}
                           title={isCurrent ? `${record.tool} is at ${detail?.location || record.homeShop}` : undefined}
                         >
-                          <span className={ui.drawerStageText}>{label}</span>
+                          <span className={`${ui.drawerStageText} tm-stage-text`}>{label}</span>
                         </button>
                       );
                     })}
@@ -382,6 +382,97 @@ export default function ToolsMovementPage() {
       ) : null}
 
       <style jsx global>{`
+        .tools-movement-font-120 {
+          font-weight: 600;
+        }
+
+        .tools-movement-font-120 .tm-heading {
+          font-size: 21.6px !important;
+          font-weight: 800 !important;
+        }
+
+        .tools-movement-font-120 .tm-subtext {
+          font-size: 14.4px !important;
+          font-weight: 600 !important;
+        }
+
+        .tools-movement-font-120 .tm-entry-field {
+          font-size: 14.4px !important;
+          font-weight: 700 !important;
+        }
+
+        .tools-movement-font-120 .tm-drawer-open {
+          font-size: 15.6px !important;
+          font-weight: 900 !important;
+        }
+
+        .tools-movement-font-120 .tm-main-action,
+        .tools-movement-font-120 .tm-filter-button,
+        .tools-movement-font-120 .tm-search-input {
+          font-size: 16.8px !important;
+          font-weight: 800 !important;
+        }
+
+        .tm-drawer,
+        .tm-stage-sheet {
+          font-weight: 600;
+        }
+
+        .tm-stage-text {
+          font-size: 120% !important;
+          font-weight: 700 !important;
+        }
+
+        .tm-label {
+          font-size: 120% !important;
+          font-weight: 800 !important;
+        }
+
+        .tm-sheet-field,
+        .tm-sheet-textarea,
+        .tm-sheet-button {
+          font-size: 120% !important;
+          font-weight: 700 !important;
+        }
+
+        @media (max-width: 760px) {
+          .tools-movement-font-120 .tm-entry-field {
+            font-size: 12px !important;
+          }
+
+          .tools-movement-font-120 .tm-main-action,
+          .tools-movement-font-120 .tm-filter-button,
+          .tools-movement-font-120 .tm-search-input {
+            font-size: 12px !important;
+          }
+
+          .tools-movement-font-120 .tm-heading {
+            font-size: 21.6px !important;
+          }
+
+          .tools-movement-font-120 .tm-subtext {
+            font-size: 12px !important;
+          }
+        }
+
+        @media (max-width: 390px) {
+          .tools-movement-font-120 .tm-entry-field {
+            font-size: 10.8px !important;
+          }
+
+          .tools-movement-font-120 .tm-main-action,
+          .tools-movement-font-120 .tm-filter-button,
+          .tools-movement-font-120 .tm-search-input {
+            font-size: 10.8px !important;
+          }
+        }
+
+        @media (max-width: 340px) {
+          .tools-movement-font-120 .tm-entry-field {
+            font-size: 10.2px !important;
+          }
+        }
+
         .movementTextList {
           border-top: 1px solid #d1d5db;
           background: #ffffff;
@@ -425,18 +516,18 @@ export default function ToolsMovementPage() {
 
         .movementTextMain strong {
           color: #111827;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 800;
         }
 
         .movementTextPath {
           color: #4b5563;
-          font-size: 9px;
+          font-size: 10.8px;
           font-weight: 600;
         }
 
         .movementTextStatus {
-          font-size: 8px;
+          font-size: 9.6px;
           font-weight: 800;
           white-space: nowrap;
         }
@@ -451,7 +542,7 @@ export default function ToolsMovementPage() {
 
         .movementTextDate {
           color: #6b7280;
-          font-size: 8px;
+          font-size: 9.6px;
           font-weight: 600;
         }
 
@@ -463,7 +554,7 @@ export default function ToolsMovementPage() {
           background: #fff0f0;
           color: #c80000;
           padding: 0 6px;
-          font-size: 8px;
+          font-size: 9.6px;
           font-weight: 800;
           cursor: pointer;
         }
@@ -484,23 +575,23 @@ export default function ToolsMovementPage() {
           }
 
           .movementTextMain strong {
-            font-size: 9px;
+            font-size: 10.8px;
           }
 
           .movementTextPath {
-            font-size: 8px;
+            font-size: 9.6px;
           }
 
           .movementTextStatus,
           .movementTextDelete {
-            font-size: 7.5px;
+            font-size: 9px;
           }
         }
       `}</style>
 
       {editor ? (
         <div className={ui.drawerBackdrop} onMouseDown={(event) => event.target === event.currentTarget && setEditor(null)}>
-          <form className={ui.stageSheet} onSubmit={saveStage}>
+          <form className={`${ui.stageSheet} tm-stage-sheet`} onSubmit={saveStage}>
             <div className={ui.drawerHandle} />
             <div className={ui.drawerHeader}>
               <div>
@@ -512,7 +603,7 @@ export default function ToolsMovementPage() {
 
             {editor.step === 4 ? (
               <div>
-                <label className={ui.label}>Final Action</label>
+                <label className={`${ui.label} tm-label`}>Final Action</label>
                 <div className={ui.finalActionGrid}>
                   {(["Returned Home", "Another Shop", "Kept There", "Not Returning"] as const).map((action) => (
                     <button
@@ -531,22 +622,22 @@ export default function ToolsMovementPage() {
 
             <div className={ui.formStack}>
               <div>
-                <label className={ui.label}>{editor.step === 2 ? "Delivered To" : editor.step === 3 ? "Collected From" : editor.step === 4 ? "Final Place" : "From"}</label>
-                <input className={ui.field} value={editor.location} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, location: event.target.value })} placeholder="Location" />
+                <label className={`${ui.label} tm-label`}>{editor.step === 2 ? "Delivered To" : editor.step === 3 ? "Collected From" : editor.step === 4 ? "Final Place" : "From"}</label>
+                <input className={`${ui.field} tm-sheet-field`} value={editor.location} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, location: event.target.value })} placeholder="Location" />
               </div>
               <div>
-                <label className={ui.label}>Date & Time</label>
-                <input className={ui.dateInput} type="datetime-local" value={editor.at} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, at: event.target.value })} />
+                <label className={`${ui.label} tm-label`}>Date & Time</label>
+                <input className={`${ui.dateInput} tm-sheet-field`} type="datetime-local" value={editor.at} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, at: event.target.value })} />
               </div>
               <div>
-                <label className={ui.label}>Notes</label>
-                <textarea className={ui.textarea} value={editor.notes} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, notes: event.target.value })} placeholder="Optional details" />
+                <label className={`${ui.label} tm-label`}>Notes</label>
+                <textarea className={`${ui.textarea} tm-sheet-textarea`} value={editor.notes} readOnly={editor.readOnly} onChange={(event) => setEditor({ ...editor, notes: event.target.value })} placeholder="Optional details" />
               </div>
             </div>
 
             <div className={ui.sheetActions}>
-              <button type="button" className={ui.secondaryButton} onClick={() => setEditor(null)}>Close</button>
-              {!editor.readOnly ? <button type="submit" className={ui.primaryButton}>Save Stage {editor.step}</button> : null}
+              <button type="button" className={`${ui.secondaryButton} tm-sheet-button`} onClick={() => setEditor(null)}>Close</button>
+              {!editor.readOnly ? <button type="submit" className={`${ui.primaryButton} tm-sheet-button`}>Save Stage {editor.step}</button> : null}
             </div>
           </form>
         </div>
