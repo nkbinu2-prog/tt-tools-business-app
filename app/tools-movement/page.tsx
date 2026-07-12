@@ -482,14 +482,14 @@ export default function ToolsMovementPage() {
           display: grid;
           grid-template-columns: minmax(0, 1fr) auto;
           align-items: center;
-          min-height: 34px;
+          min-height: 39px;
           border-bottom: 1px solid #d1d5db;
           background: #ffffff;
         }
 
         .movementTextMain {
           min-width: 0;
-          height: 33px;
+          height: 38px;
           display: grid;
           grid-template-columns:
             minmax(70px, 1.2fr)
@@ -516,18 +516,18 @@ export default function ToolsMovementPage() {
 
         .movementTextMain strong {
           color: #111827;
-          font-size: 12px;
+          font-size: 13.8px;
           font-weight: 800;
         }
 
         .movementTextPath {
           color: #4b5563;
-          font-size: 10.8px;
+          font-size: 12.42px;
           font-weight: 600;
         }
 
         .movementTextStatus {
-          font-size: 9.6px;
+          font-size: 11.04px;
           font-weight: 800;
           white-space: nowrap;
         }
@@ -542,19 +542,19 @@ export default function ToolsMovementPage() {
 
         .movementTextDate {
           color: #6b7280;
-          font-size: 9.6px;
+          font-size: 11.04px;
           font-weight: 600;
         }
 
         .movementTextDelete {
-          height: 25px;
+          height: 29px;
           margin-right: 4px;
           border: 0;
           border-radius: 5px;
           background: #fff0f0;
           color: #c80000;
           padding: 0 6px;
-          font-size: 9.6px;
+          font-size: 11.04px;
           font-weight: 800;
           cursor: pointer;
         }
@@ -575,16 +575,16 @@ export default function ToolsMovementPage() {
           }
 
           .movementTextMain strong {
-            font-size: 10.8px;
+            font-size: 12.42px;
           }
 
           .movementTextPath {
-            font-size: 9.6px;
+            font-size: 11.04px;
           }
 
           .movementTextStatus,
           .movementTextDelete {
-            font-size: 9px;
+            font-size: 10.35px;
           }
         }
       `}</style>

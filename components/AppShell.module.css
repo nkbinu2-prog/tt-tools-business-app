@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  background: #f4f6f8;
+  background: #b8b8b8;
   color: #1f2937;
 }
 
