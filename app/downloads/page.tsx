@@ -416,10 +416,10 @@ export default function DownloadsPage() {
               <span className="check">{selected.money ? "✓" : ""}</span>
               <span>
                 <strong>Income & Expense</strong>
-                <small>
+                <small className="section-stat">
                   {filteredIncome.length} income · {formatCurrency(incomeTotal)}
                 </small>
-                <small>
+                <small className="section-stat">
                   {filteredExpenses.length} expense · {formatCurrency(expenseTotal)}
                 </small>
               </span>
@@ -436,7 +436,9 @@ export default function DownloadsPage() {
               <span className="check">{selected.movements ? "✓" : ""}</span>
               <span>
                 <strong>Tools Movement</strong>
-                <small>{filteredMovements.length} movement records · no cash</small>
+                <small className="section-stat">
+                  {filteredMovements.length} movement records · no cash
+                </small>
               </span>
             </button>
 
@@ -451,7 +453,7 @@ export default function DownloadsPage() {
               <span className="check">{selected.tripCash ? "✓" : ""}</span>
               <span>
                 <strong>Trip Cash</strong>
-                <small>
+                <small className="section-stat">
                   {filteredTripCash.length} records · {formatCurrency(tripCashTotal)}
                 </small>
               </span>
@@ -619,6 +621,12 @@ export default function DownloadsPage() {
           font-size: 11px;
           font-weight: 650;
           line-height: 1.25;
+        }
+
+        .section-option .section-stat {
+          font-size: 13px;
+          font-weight: 800;
+          line-height: 1.3;
         }
 
         .loading-message,
