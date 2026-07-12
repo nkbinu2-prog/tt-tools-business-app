@@ -21,7 +21,7 @@ type Filter = "Pending" | "Received" | "All";
 function blankForm() {
   return {
     customer: "",
-    shop: SHOPS[0] as string,
+    shop: "",
     customShop: "",
     location: "",
     amount: "",
@@ -59,7 +59,13 @@ export default function TripCashPage() {
   function save(event: FormEvent) {
     event.preventDefault();
     const amount = Number(form.amount);
-    if (!form.customer.trim() || !form.location.trim() || !Number.isFinite(amount) || amount <= 0) return;
+    if (
+      !form.customer.trim() ||
+      !form.shop ||
+      !form.location.trim() ||
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) return;
     if (form.shop === "Other" && !form.customShop.trim()) return;
 
     if (editingId) {
@@ -161,35 +167,82 @@ export default function TripCashPage() {
         <form className={`${ui.panel} ${ui.composer} tc-form`} onSubmit={save}>
           <div className={`${ui.formStack} tc-form-stack`}>
             <div>
-              <label className={`${ui.label} tc-label`}>Customer Name</label>
-              <input className={`${ui.field} tc-field`} value={form.customer} onChange={(event) => setForm({ ...form, customer: event.target.value })} placeholder="Customer name" required />
+              <input
+                className={`${ui.field} tc-field`}
+                value={form.customer}
+                onChange={(event) =>
+                  setForm({ ...form, customer: event.target.value })
+                }
+                placeholder="Customer Name"
+                aria-label="Customer Name"
+                required
+              />
             </div>
 
             <div className={ui.tripTwoColumns}>
               <div>
-                <label className={`${ui.label} tc-label`}>Shop</label>
-                <select className={`${ui.select} tc-field`} value={form.shop} onChange={(event) => setForm({ ...form, shop: event.target.value })}>
-                  {SHOPS.map((shop) => <option key={shop}>{shop}</option>)}
+                <select
+                  className={`${ui.select} tc-field`}
+                  value={form.shop}
+                  onChange={(event) =>
+                    setForm({ ...form, shop: event.target.value })
+                  }
+                  aria-label="Shop"
+                  required
+                >
+                  <option value="" disabled>
+                    Shop
+                  </option>
+                  {SHOPS.map((shop) => (
+                    <option key={shop}>{shop}</option>
+                  ))}
                   <option>Other</option>
                 </select>
               </div>
               <div>
-                <label className={`${ui.label} tc-label`}>Location</label>
-                <input className={`${ui.field} tc-field`} value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} placeholder="Trip location" required />
+                <input
+                  className={`${ui.field} tc-field`}
+                  value={form.location}
+                  onChange={(event) =>
+                    setForm({ ...form, location: event.target.value })
+                  }
+                  placeholder="Location"
+                  aria-label="Location"
+                  required
+                />
               </div>
             </div>
 
             {form.shop === "Other" ? (
               <div>
-                <label className={`${ui.label} tc-label`}>Other Shop Name</label>
-                <input className={`${ui.field} tc-field`} value={form.customShop} onChange={(event) => setForm({ ...form, customShop: event.target.value })} placeholder="Enter shop name" required />
+                <input
+                  className={`${ui.field} tc-field`}
+                  value={form.customShop}
+                  onChange={(event) =>
+                    setForm({ ...form, customShop: event.target.value })
+                  }
+                  placeholder="Other Shop Name"
+                  aria-label="Other Shop Name"
+                  required
+                />
               </div>
             ) : null}
 
             <div className={ui.tripAmountRow}>
               <div>
-                <label className={`${ui.label} tc-label`}>Amount</label>
-                <input className={`${ui.amountInput} tc-amount-input`} type="number" min="1" inputMode="decimal" value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} placeholder="₹ 0" required />
+                <input
+                  className={`${ui.amountInput} tc-amount-input`}
+                  type="number"
+                  min="1"
+                  inputMode="decimal"
+                  value={form.amount}
+                  onChange={(event) =>
+                    setForm({ ...form, amount: event.target.value })
+                  }
+                  placeholder="Amount"
+                  aria-label="Amount"
+                  required
+                />
               </div>
               <div>
                 <label className={`${ui.label} tc-label`}>Trips</label>
@@ -202,7 +255,6 @@ export default function TripCashPage() {
             </div>
 
             <div>
-              <label className={`${ui.label} tc-label`}>Date</label>
               <div className={ui.dateToggleRow}>
                 <button type="button" className={`${ui.filterButton} tc-control-button ${form.date === todayIso() ? ui.filterButtonActive : ""}`} onClick={() => setForm({ ...form, date: todayIso() })}>Today</button>
                 <input className={`${ui.dateInput} tc-date-input`} type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} />
@@ -210,8 +262,15 @@ export default function TripCashPage() {
             </div>
 
             <div>
-              <label className={`${ui.label} tc-label`}>Notes</label>
-              <textarea className={`${ui.textarea} tc-textarea`} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} placeholder="Optional note" />
+              <textarea
+                className={`${ui.textarea} tc-textarea`}
+                value={form.notes}
+                onChange={(event) =>
+                  setForm({ ...form, notes: event.target.value })
+                }
+                placeholder="Notes"
+                aria-label="Notes"
+              />
             </div>
           </div>
 
@@ -247,73 +306,74 @@ export default function TripCashPage() {
                   }`}
                   key={item.id}
                 >
-                  <div className="tc-record-line tc-record-line-one">
-                    <div className="tc-record-name" title={item.customer}>
-                      {item.customer}
-                    </div>
+                  <button
+                    type="button"
+                    className="tc-record-open"
+                    onClick={() => edit(item)}
+                    title="Tap to edit"
+                    aria-label={`Edit ${item.customer}`}
+                  >
+                    <span className="tc-record-line tc-record-line-one">
+                      <span className="tc-record-name" title={item.customer}>
+                        {item.customer}
+                      </span>
 
-                    <div className="tc-record-place" title={`${shopName} · ${item.location}`}>
-                      {shopName} · {item.location}
-                    </div>
+                      <span
+                        className="tc-record-place"
+                        title={`${shopName} · ${item.location}`}
+                      >
+                        {shopName} · {item.location}
+                      </span>
 
-                    <div
-                      className={`tc-record-status ${
-                        item.status === "Received" ? "received" : "pending"
-                      }`}
-                    >
-                      {item.status}
-                    </div>
+                      <span
+                        className={`tc-record-status ${
+                          item.status === "Received" ? "received" : "pending"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
 
-                    <div className="tc-record-amount">
-                      {formatCurrency(item.amount)}
-                    </div>
-                  </div>
+                      <span className="tc-record-amount">
+                        {formatCurrency(item.amount)}
+                      </span>
+                    </span>
 
-                  <div className="tc-record-line tc-record-line-two">
-                    <div className="tc-record-meta">
+                    <span className="tc-record-meta">
                       {item.trips} {item.trips === 1 ? "trip" : "trips"} ·{" "}
                       {formatDisplayDate(item.date)}
                       {item.notes ? ` · ${item.notes}` : ""}
                       {item.receivedAt
                         ? ` · Received ${formatDateTime(item.receivedAt)}`
                         : ""}
-                    </div>
+                    </span>
+                  </button>
 
-                    <div className="tc-record-actions">
-                      {item.status === "Pending" ? (
-                        <button
-                          type="button"
-                          className="tc-record-button tc-received-button"
-                          onClick={() => markReceived(item.id)}
-                        >
-                          ✓ Received
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="tc-record-button"
-                          onClick={() => restorePending(item.id)}
-                        >
-                          To Pending
-                        </button>
-                      )}
-
+                  <div className="tc-record-actions">
+                    {item.status === "Pending" ? (
+                      <button
+                        type="button"
+                        className="tc-record-button tc-received-button"
+                        onClick={() => markReceived(item.id)}
+                      >
+                        ✓ Received
+                      </button>
+                    ) : (
                       <button
                         type="button"
                         className="tc-record-button"
-                        onClick={() => edit(item)}
+                        onClick={() => restorePending(item.id)}
                       >
-                        Edit
+                        To Pending
                       </button>
+                    )}
 
-                      <button
-                        type="button"
-                        className="tc-record-button tc-delete-button"
-                        onClick={() => remove(item.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      className="tc-record-button tc-delete-button"
+                      onClick={() => remove(item.id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </article>
               );
@@ -486,13 +546,28 @@ export default function TripCashPage() {
 
         .trip-cash-compact .tc-record-row {
           min-width: 0;
-          padding: 4px 3px;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 3px;
           border-bottom: 1px solid #d1d5db;
           background: #ffffff;
         }
 
         .trip-cash-compact .tc-record-received {
           background: #fbfffc;
+        }
+
+        .trip-cash-compact .tc-record-open {
+          min-width: 0;
+          display: grid;
+          gap: 3px;
+          border: 0;
+          background: transparent;
+          padding: 0;
+          text-align: left;
+          cursor: pointer;
         }
 
         .trip-cash-compact .tc-record-line {
@@ -508,13 +583,7 @@ export default function TripCashPage() {
             minmax(85px, 1.35fr)
             auto
             auto;
-          min-height: 17px;
-        }
-
-        .trip-cash-compact .tc-record-line-two {
-          grid-template-columns: minmax(0, 1fr) auto;
-          min-height: 24px;
-          margin-top: 2px;
+          min-height: 19px;
         }
 
         .trip-cash-compact .tc-record-name,
@@ -528,19 +597,19 @@ export default function TripCashPage() {
 
         .trip-cash-compact .tc-record-name {
           color: #111827;
-          font-size: 11.4px;
+          font-size: 13.11px;
           font-weight: 800;
         }
 
         .trip-cash-compact .tc-record-place,
         .trip-cash-compact .tc-record-meta {
           color: #5b6472;
-          font-size: 9.36px;
-          font-weight: 500;
+          font-size: 10.76px;
+          font-weight: 600;
         }
 
         .trip-cash-compact .tc-record-status {
-          font-size: 8.4px;
+          font-size: 9.66px;
           font-weight: 800;
           white-space: nowrap;
         }
@@ -555,7 +624,7 @@ export default function TripCashPage() {
 
         .trip-cash-compact .tc-record-amount {
           color: #111827;
-          font-size: 12.6px;
+          font-size: 14.49px;
           font-weight: 900;
           white-space: nowrap;
         }
@@ -574,7 +643,7 @@ export default function TripCashPage() {
           background: #f1f3f6;
           color: #374151;
           padding: 0 5px;
-          font-size: 8.4px;
+          font-size: 9.66px;
           font-weight: 800;
           white-space: nowrap;
           cursor: pointer;
@@ -617,17 +686,17 @@ export default function TripCashPage() {
           }
 
           .trip-cash-compact .tc-record-name {
-            font-size: 10.8px;
+            font-size: 12.42px;
           }
 
           .trip-cash-compact .tc-record-place,
           .trip-cash-compact .tc-record-meta {
-            font-size: 8.76px;
+            font-size: 10.07px;
           }
 
           .trip-cash-compact .tc-record-button {
             padding: 0 4px;
-            font-size: 7.92px;
+            font-size: 9.11px;
           }
         }
       `}</style>

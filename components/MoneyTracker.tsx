@@ -33,7 +33,7 @@ function makeForm(type: TrackerType) {
     details: "",
     amount: "",
     mode: (type === "income" ? "GPay" : "") as IncomeMode,
-    shop: type === "income" ? shops[0] : "",
+    shop: "",
     notes: "",
   };
 }
@@ -147,7 +147,7 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
       details: item.details,
       amount: String(item.amount),
       mode: isExpense ? "" : item.mode || "GPay",
-      shop: isExpense ? "" : item.shop || shops[0],
+      shop: isExpense ? "" : item.shop || "",
       notes: item.notes,
     });
 
@@ -202,31 +202,32 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
         <div className={`${ui.formStack} mt-form-stack`}>
           {isExpense ? (
             <div className="mt-field-group">
-              <label className={`${ui.label} mt-label`}>
-                Expense Details
-              </label>
               <input
                 className={`${ui.field} mt-field`}
                 value={form.details}
                 onChange={(event) =>
                   setForm({ ...form, details: event.target.value })
                 }
-                placeholder="What was the expense?"
+                placeholder="Expense Details"
+                aria-label="Expense Details"
                 required
               />
             </div>
           ) : (
             <>
               <div className="mt-field-group">
-                <label className={`${ui.label} mt-label`}>Shop</label>
                 <select
                   className={`${ui.select} mt-field`}
                   value={form.shop}
                   onChange={(event) =>
                     setForm({ ...form, shop: event.target.value })
                   }
+                  aria-label="Shop"
                   required
                 >
+                  <option value="" disabled>
+                    Shop
+                  </option>
                   {shops.map((shop) => (
                     <option key={shop} value={shop}>
                       {shop}
@@ -236,8 +237,6 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
               </div>
 
               <div className="mt-field-group">
-                <label className={`${ui.label} mt-label`}>Mode</label>
-
                 <div className={`${ui.modeButtons} mt-mode-buttons`}>
                   {(["GPay", "Cash", "Staff Collection"] as const).map(
                     (mode) => (
@@ -263,7 +262,6 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           )}
 
           <div className="mt-field-group">
-            <label className={`${ui.label} mt-label`}>Amount</label>
             <input
               className={`${ui.amountInput} mt-amount-input`}
               type="number"
@@ -274,26 +272,25 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
               onChange={(event) =>
                 setForm({ ...form, amount: event.target.value })
               }
-              placeholder="₹ 0"
+              placeholder="Amount"
+              aria-label="Amount"
               required
             />
           </div>
 
           <div className="mt-field-group">
-            <label className={`${ui.label} mt-label`}>Notes</label>
             <textarea
               className={`${ui.textarea} mt-textarea`}
               value={form.notes}
               onChange={(event) =>
                 setForm({ ...form, notes: event.target.value })
               }
-              placeholder="Optional notes"
+              placeholder="Notes"
+              aria-label="Notes"
             />
           </div>
 
           <div className="mt-field-group">
-            <label className={`${ui.label} mt-label`}>Date</label>
-
             <div className={`${ui.dateToggleRow} mt-date-row`}>
               <button
                 type="button"
@@ -375,26 +372,22 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
         <div className="mt-entry-list">
           {visibleItems.map((item) => (
             <article className="mt-entry-row" key={item.id}>
-              <div className="mt-entry-text" title={entryText(item)}>
-                {entryText(item)}
-              </div>
-
-              <div
-                className={`mt-entry-amount ${
-                  !isExpense ? "mt-entry-income" : ""
-                }`}
-              >
-                {formatCurrency(item.amount)}
-              </div>
-
               <button
                 type="button"
-                className="mt-entry-action"
+                className="mt-entry-open"
                 onClick={() => startEdit(item)}
-                aria-label="Edit"
-                title="Edit"
+                aria-label={`Edit ${entryText(item)}`}
+                title="Tap to edit"
               >
-                Edit
+                <span className="mt-entry-text">{entryText(item)}</span>
+
+                <span
+                  className={`mt-entry-amount ${
+                    !isExpense ? "mt-entry-income" : ""
+                  }`}
+                >
+                  {formatCurrency(item.amount)}
+                </span>
               </button>
 
               <button
@@ -581,21 +574,35 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
         .money-tracker-compact .mt-entry-row {
           min-width: 0;
           display: grid;
-          grid-template-columns: minmax(0, 1fr) auto auto auto;
+          grid-template-columns: minmax(0, 1fr) auto;
           align-items: center;
-          gap: 5px;
-          min-height: 34px;
-          padding: 4px 2px;
+          gap: 6px;
+          min-height: 39px;
+          padding: 5px 3px;
           border-bottom: 1px solid #d1d5db;
           background: #ffffff;
+        }
+
+        .money-tracker-compact .mt-entry-open {
+          min-width: 0;
+          min-height: 29px;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 7px;
+          border: 0;
+          background: transparent;
+          padding: 0 2px;
+          text-align: left;
+          cursor: pointer;
         }
 
         .money-tracker-compact .mt-entry-text {
           min-width: 0;
           overflow: hidden;
           color: #374151;
-          font-size: 10.8px;
-          font-weight: 500;
+          font-size: 12.42px;
+          font-weight: 700;
           line-height: 1.2;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -603,8 +610,8 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
 
         .money-tracker-compact .mt-entry-amount {
           color: #8d0000;
-          font-size: 13.2px;
-          font-weight: 800;
+          font-size: 15.18px;
+          font-weight: 900;
           white-space: nowrap;
         }
 
@@ -612,25 +619,16 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           color: #087a2b;
         }
 
-        .money-tracker-compact .mt-entry-action,
         .money-tracker-compact .mt-entry-delete {
-          min-height: 25px;
-          height: 25px;
+          min-height: 29px;
+          height: 29px;
           border: 0;
           border-radius: 5px;
-          padding: 0 6px;
+          padding: 0 7px;
           font: inherit;
-          font-size: 9.6px;
-          font-weight: 700;
+          font-size: 11.04px;
+          font-weight: 800;
           cursor: pointer;
-        }
-
-        .money-tracker-compact .mt-entry-action {
-          background: #f1f3f6;
-          color: #374151;
-        }
-
-        .money-tracker-compact .mt-entry-delete {
           background: #fff0f0;
           color: #c80000;
         }
@@ -650,13 +648,12 @@ export default function MoneyTracker({ type }: { type: TrackerType }) {
           }
 
           .money-tracker-compact .mt-entry-text {
-            font-size: 10.2px;
+            font-size: 11.73px;
           }
 
-          .money-tracker-compact .mt-entry-action,
           .money-tracker-compact .mt-entry-delete {
-            padding: 0 4px;
-            font-size: 9px;
+            padding: 0 5px;
+            font-size: 10.35px;
           }
         }
       `}</style>
