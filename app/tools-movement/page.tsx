@@ -70,9 +70,12 @@ function shortLocation(location?: string) {
 function movementPath(record: MovementRecord) {
   const locations = ([1, 2, 3, 4] as StageNumber[])
     .map((step) => stageDetails(record, step)?.location?.trim())
-    .filter((location): location is string => Boolean(location));
+    .filter((location): location is string => Boolean(location))
+    .map(shortLocation);
 
-  return locations.length > 0 ? locations.join(" → ") : record.homeShop;
+  return locations.length > 0
+    ? locations.join(" → ")
+    : shortLocation(record.homeShop);
 }
 
 export default function ToolsMovementPage() {
@@ -276,38 +279,51 @@ export default function ToolsMovementPage() {
         {visibleHistory.length === 0 ? (
           <div className={ui.empty}>No movement records found.</div>
         ) : (
-          <div className={ui.movementHistoryList}>
+          <div className="movementTextList">
             {visibleHistory.map((record) => (
-              <article className={ui.movementHistoryCard} key={record.id}>
-                <div className={ui.historyTitleRow}>
-                  <div>
-                    <h3>{record.tool}</h3>
-                    <p>{movementPath(record)}</p>
-                  </div>
-                  <span className={`${ui.statusBadge} ${record.stage === 4 ? ui.completedStatus : ui.activeStatus}`}>
-                    {record.stage === 4 ? "Completed" : `Stage ${record.stage}/4`}
+              <div className="movementTextRow" key={record.id}>
+                <button
+                  type="button"
+                  className="movementTextMain"
+                  onClick={() => {
+                    if (record.stage < 4) setShowDrawer(true);
+                  }}
+                  title={
+                    record.stage < 4
+                      ? "Open active movement"
+                      : `${record.tool} • ${movementPath(record)}`
+                  }
+                >
+                  <strong>{record.tool}</strong>
+                  <span className="movementTextPath">
+                    {movementPath(record)}
                   </span>
-                </div>
-                <div className={ui.historySteps}>
-                  {([1, 2, 3, 4] as StageNumber[]).map((step) => {
-                    const detail = stageDetails(record, step);
-                    return (
-                      <button key={step} type="button" className={`${ui.historyStep} ${detail ? ui.historyStepDone : ""}`} onClick={() => detail ? openStage(record, step) : undefined}>
-                        <b>{step}</b>
-                        <span>{detail ? shortLocation(detail.location) : stageLabel(step)}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className={ui.historyMeta}>
-                  Started {formatDateTime(record.step1.at)}
-                  {record.step4 ? ` · Finished ${formatDateTime(record.step4.at)}` : ""}
-                </div>
-                <div className={ui.cardActions}>
-                  {record.stage < 4 ? <button type="button" className={ui.smallButton} onClick={() => setShowDrawer(true)}>Open Movements</button> : null}
-                  <button type="button" className={ui.dangerButton} onClick={() => removeRecord(record.id)}>Delete</button>
-                </div>
-              </article>
+                  <span
+                    className={
+                      record.stage === 4
+                        ? "movementTextStatus completed"
+                        : "movementTextStatus active"
+                    }
+                  >
+                    {record.stage === 4
+                      ? "Completed"
+                      : `Active ${record.stage}/4`}
+                  </span>
+                  <span className="movementTextDate">
+                    {record.step4
+                      ? formatDateTime(record.step4.at)
+                      : formatDateTime(record.step1.at)}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  className="movementTextDelete"
+                  onClick={() => removeRecord(record.id)}
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -364,6 +380,123 @@ export default function ToolsMovementPage() {
           </section>
         </div>
       ) : null}
+
+      <style jsx global>{`
+        .movementTextList {
+          border-top: 1px solid #d1d5db;
+          background: #ffffff;
+        }
+
+        .movementTextRow {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          min-height: 34px;
+          border-bottom: 1px solid #d1d5db;
+          background: #ffffff;
+        }
+
+        .movementTextMain {
+          min-width: 0;
+          height: 33px;
+          display: grid;
+          grid-template-columns:
+            minmax(70px, 1.2fr)
+            minmax(90px, 1.8fr)
+            auto
+            auto;
+          align-items: center;
+          gap: 7px;
+          border: 0;
+          background: transparent;
+          color: #374151;
+          padding: 0 7px;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .movementTextMain strong,
+        .movementTextMain span {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .movementTextMain strong {
+          color: #111827;
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .movementTextPath {
+          color: #4b5563;
+          font-size: 9px;
+          font-weight: 600;
+        }
+
+        .movementTextStatus {
+          font-size: 8px;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+
+        .movementTextStatus.active {
+          color: #075985;
+        }
+
+        .movementTextStatus.completed {
+          color: #087a2b;
+        }
+
+        .movementTextDate {
+          color: #6b7280;
+          font-size: 8px;
+          font-weight: 600;
+        }
+
+        .movementTextDelete {
+          height: 25px;
+          margin-right: 4px;
+          border: 0;
+          border-radius: 5px;
+          background: #fff0f0;
+          color: #c80000;
+          padding: 0 6px;
+          font-size: 8px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+          .movementTextMain {
+            grid-template-columns:
+              minmax(62px, 1.1fr)
+              minmax(70px, 1.6fr)
+              auto;
+            gap: 4px;
+            padding-left: 4px;
+            padding-right: 4px;
+          }
+
+          .movementTextDate {
+            display: none;
+          }
+
+          .movementTextMain strong {
+            font-size: 9px;
+          }
+
+          .movementTextPath {
+            font-size: 8px;
+          }
+
+          .movementTextStatus,
+          .movementTextDelete {
+            font-size: 7.5px;
+          }
+        }
+      `}</style>
 
       {editor ? (
         <div className={ui.drawerBackdrop} onMouseDown={(event) => event.target === event.currentTarget && setEditor(null)}>

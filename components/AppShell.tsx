@@ -15,12 +15,12 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { href: "/reminders", label: "Notes & Reminders", mobileLabel: "Notes", icon: "notes" },
   { href: "/expenses", label: "Income & Expenses", mobileLabel: "Money", icon: "money" },
   { href: "/tools-movement", label: "Tools Movement", mobileLabel: "Moving", icon: "movement" },
   { href: "/trip-cash", label: "Trip Cash", mobileLabel: "Trip Cash", icon: "trip" },
   { href: "/rental-calculator", label: "Rental Calculator", mobileLabel: "Calculator", icon: "calculator" },
   { href: "/rental-collection", label: "Rental Collection", mobileLabel: "Collection", icon: "collection" },
+  { href: "/reminders", label: "Notes & Reminders", mobileLabel: "Notes", icon: "notes" },
 ];
 
 function NavIcon({ name }: { name: IconName }) {
