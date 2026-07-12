@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import AuthGate from "@/components/AuthGate";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "T&T Tools Business App",
-  description: "Notes, expenses, income, tool movements, trip cash and rental calculator for T&T Tools",
+  description:
+    "Notes, expenses, income, tool movements, trip cash and rental calculator for T&T Tools",
   applicationName: "T&T Tools Business App",
 };
 
@@ -19,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthGate>{children}</AuthGate>
+      </body>
     </html>
   );
 }
