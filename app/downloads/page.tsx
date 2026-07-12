@@ -56,13 +56,13 @@ function inDateRange(date: string, fromDate: string, toDate: string) {
 }
 
 export default function DownloadsPage() {
-  const { items: expenseItems } =
+  const { items: expenseItems, loaded: expensesLoaded } =
     useStoredList<MoneyEntryWithShop>(STORAGE_KEYS.expenses);
-  const { items: incomeItems } =
+  const { items: incomeItems, loaded: incomeLoaded } =
     useStoredList<MoneyEntryWithShop>(STORAGE_KEYS.income);
-  const { items: movementItems } =
+  const { items: movementItems, loaded: movementsLoaded } =
     useStoredList<MovementRecord>(STORAGE_KEYS.movements);
-  const { items: tripCashItems } =
+  const { items: tripCashItems, loaded: tripCashLoaded } =
     useStoredList<TripCashEntry>(STORAGE_KEYS.tripCash);
 
   const [fromDate, setFromDate] = useState(monthStartIso);
@@ -123,6 +123,9 @@ export default function DownloadsPage() {
   const hasSelection =
     selected.money || selected.movements || selected.tripCash;
 
+  const dataLoaded =
+    expensesLoaded && incomeLoaded && movementsLoaded && tripCashLoaded;
+
   function toggle(name: keyof Selection) {
     setSelected((current) => ({
       ...current,
@@ -176,7 +179,15 @@ export default function DownloadsPage() {
   }
 
   function downloadReport() {
-    if (!hasSelection || !fromDate || !toDate || fromDate > toDate) return;
+    if (
+      !dataLoaded ||
+      !hasSelection ||
+      !fromDate ||
+      !toDate ||
+      fromDate > toDate
+    ) {
+      return;
+    }
 
     const workbook = XLSX.utils.book_new();
     const periodText = `Period: ${fromDate} to ${toDate}`;
@@ -406,7 +417,10 @@ export default function DownloadsPage() {
               <span>
                 <strong>Income & Expense</strong>
                 <small>
-                  {filteredIncome.length} income · {filteredExpenses.length} expense
+                  {filteredIncome.length} income · {formatCurrency(incomeTotal)}
+                </small>
+                <small>
+                  {filteredExpenses.length} expense · {formatCurrency(expenseTotal)}
                 </small>
               </span>
             </button>
@@ -422,7 +436,7 @@ export default function DownloadsPage() {
               <span className="check">{selected.movements ? "✓" : ""}</span>
               <span>
                 <strong>Tools Movement</strong>
-                <small>{filteredMovements.length} movement records</small>
+                <small>{filteredMovements.length} movement records · no cash</small>
               </span>
             </button>
 
@@ -437,25 +451,18 @@ export default function DownloadsPage() {
               <span className="check">{selected.tripCash ? "✓" : ""}</span>
               <span>
                 <strong>Trip Cash</strong>
-                <small>{filteredTripCash.length} trip cash records</small>
+                <small>
+                  {filteredTripCash.length} records · {formatCurrency(tripCashTotal)}
+                </small>
               </span>
             </button>
           </div>
 
-          <div className="summary-grid">
-            <div>
-              <span>Income</span>
-              <strong>{formatCurrency(incomeTotal)}</strong>
+          {!dataLoaded ? (
+            <div className="loading-message">
+              Loading cloud records…
             </div>
-            <div>
-              <span>Expense</span>
-              <strong>{formatCurrency(expenseTotal)}</strong>
-            </div>
-            <div>
-              <span>Trip Cash</span>
-              <strong>{formatCurrency(tripCashTotal)}</strong>
-            </div>
-          </div>
+          ) : null}
 
           {fromDate > toDate ? (
             <div className="error-message">
@@ -467,7 +474,7 @@ export default function DownloadsPage() {
             type="button"
             className="download-button"
             onClick={downloadReport}
-            disabled={!hasSelection || fromDate > toDate}
+            disabled={!dataLoaded || !hasSelection || fromDate > toDate}
           >
             Download Excel File
           </button>
@@ -562,7 +569,7 @@ export default function DownloadsPage() {
           grid-template-columns: 30px minmax(0, 1fr);
           align-items: center;
           gap: 9px;
-          min-height: 78px;
+          min-height: 88px;
           border: 1px solid #d7dce4;
           border-radius: 12px;
           padding: 12px;
@@ -614,43 +621,23 @@ export default function DownloadsPage() {
           line-height: 1.25;
         }
 
-        .summary-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 8px;
-          margin-top: 18px;
-        }
-
-        .summary-grid div {
-          min-width: 0;
+        .loading-message,
+        .error-message {
+          margin-top: 14px;
+          border-radius: 9px;
           padding: 10px 12px;
-          border-radius: 10px;
-          background: #f4f6f8;
+          font-size: 13px;
+          font-weight: 800;
         }
 
-        .summary-grid span,
-        .summary-grid strong {
-          display: block;
-        }
-
-        .summary-grid span {
-          color: #6b7280;
-          font-size: 11px;
-          font-weight: 750;
-        }
-
-        .summary-grid strong {
-          margin-top: 4px;
-          color: #111827;
-          font-size: 20px;
-          font-weight: 900;
+        .loading-message {
+          background: #fff7d6;
+          color: #7a4b00;
         }
 
         .error-message {
-          margin-top: 12px;
+          background: #fff0f0;
           color: #b00000;
-          font-size: 13px;
-          font-weight: 800;
         }
 
         .download-button {
@@ -706,17 +693,6 @@ export default function DownloadsPage() {
             padding: 9px;
           }
 
-          .summary-grid {
-            gap: 5px;
-          }
-
-          .summary-grid div {
-            padding: 8px;
-          }
-
-          .summary-grid strong {
-            font-size: 16px;
-          }
         }
       `}</style>
     </AppShell>
