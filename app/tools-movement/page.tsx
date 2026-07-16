@@ -17,6 +17,15 @@ import { useStoredList } from "@/lib/useStoredList";
 
 type StageNumber = 1 | 2 | 3 | 4;
 type HistoryFilter = "Active" | "Completed" | "All";
+
+type MovementDraftWithMode = MovementDraftRow & {
+  simpleMovement: boolean;
+};
+
+type MovementRecordWithMode = MovementRecord & {
+  simpleMovement?: boolean;
+};
+
 type StageEditor = {
   recordId: string;
   step: StageNumber;
@@ -43,8 +52,11 @@ const LOCATION_CODES: Record<string, string> = {
   Other: "OTHER",
 };
 
-function makeRows(count = 8) {
-  return Array.from({ length: count }, () => createMovementDraftRow());
+function makeRows(count = 8): MovementDraftWithMode[] {
+  return Array.from({ length: count }, () => ({
+    ...createMovementDraftRow(),
+    simpleMovement: false,
+  }));
 }
 
 function stageLabel(step: StageNumber) {
@@ -79,8 +91,8 @@ function movementPath(record: MovementRecord) {
 }
 
 export default function ToolsMovementPage() {
-  const { items, setItems } = useStoredList<MovementRecord>(STORAGE_KEYS.movements);
-  const [rows, setRows] = useState<MovementDraftRow[]>(() => makeRows());
+  const { items, setItems } = useStoredList<MovementRecordWithMode>(STORAGE_KEYS.movements);
+  const [rows, setRows] = useState<MovementDraftWithMode[]>(() => makeRows());
   const [showDrawer, setShowDrawer] = useState(false);
   const [editor, setEditor] = useState<StageEditor | null>(null);
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("Active");
@@ -117,7 +129,7 @@ export default function ToolsMovementPage() {
       .sort((a, b) => b.updatedAt - a.updatedAt);
   }, [historyFilter, items, search]);
 
-  function updateRow(id: string, patch: Partial<MovementDraftRow>) {
+  function updateRow(id: string, patch: Partial<MovementDraftWithMode>) {
     setRows((current) => current.map((row) => row.id === id ? { ...row, ...patch } : row));
   }
 
@@ -128,13 +140,14 @@ export default function ToolsMovementPage() {
 
     const now = Date.now();
     const startedAt = nowLocalDateTime();
-    const newItems: MovementRecord[] = readyRows.map((row) => ({
+    const newItems: MovementRecordWithMode[] = readyRows.map((row) => ({
       id: makeId("movement"),
       tool: row.tool.trim(),
       qty: 1,
       homeShop: row.homeShop,
       firstDestination: "",
       startNotes: row.notes.trim(),
+      simpleMovement: row.simpleMovement,
       stage: 1,
       step1: {
         at: startedAt,
@@ -151,9 +164,12 @@ export default function ToolsMovementPage() {
     setShowDrawer(true);
   }
 
-  function openStage(record: MovementRecord, step: StageNumber) {
+  function openStage(record: MovementRecordWithMode, step: StageNumber) {
     const completed = step <= record.stage;
-    const canEnter = step === record.stage + 1;
+    const canEnter = record.simpleMovement
+      ? record.stage === 1 && step === 4
+      : step === record.stage + 1;
+
     if (!completed && !canEnter) return;
 
     const existing = stageDetails(record, step);
@@ -219,7 +235,7 @@ export default function ToolsMovementPage() {
   }
 
   return (
-    <AppShell title="Tools Movement" subtitle="Enter tools quickly, then move each one through four stops">
+    <AppShell title="Tools Movement" subtitle="Use the normal four-point flow or tick Simple for Start and End only">
       <div className={`${ui.screen} tools-movement-font-120`}>
         <div className={ui.movementTopActions}>
           <button type="button" className={`${ui.drawerOpenButton} tm-drawer-open`} onClick={() => setShowDrawer(true)}>
@@ -231,13 +247,13 @@ export default function ToolsMovementPage() {
           <div className={ui.movementHeader}>
             <div>
               <h2 className="tm-heading">Start Moving Tools</h2>
-              <p className="tm-subtext">Tool, From and Note only. The first stage starts automatically.</p>
+              <p className="tm-subtext">Tick Simple when only Start and End are required. Leave it off for all four points.</p>
             </div>
           </div>
 
           <div className={ui.movementEntryTable}>
             {rows.map((row, index) => (
-              <div className={ui.movementEntryRow} key={row.id}>
+              <div className={`${ui.movementEntryRow} tm-entry-row-with-mode`} key={row.id}>
                 <div className={ui.rowNumber}>{index + 1}</div>
                 <input
                   className={`${ui.field} ${ui.movementToolField} tm-entry-field`}
@@ -259,6 +275,20 @@ export default function ToolsMovementPage() {
                   onChange={(event) => updateRow(row.id, { notes: event.target.value })}
                   placeholder="Note"
                 />
+                <button
+                  type="button"
+                  className={`tm-simple-toggle ${row.simpleMovement ? "active" : ""}`}
+                  onClick={() =>
+                    updateRow(row.id, { simpleMovement: !row.simpleMovement })
+                  }
+                  aria-pressed={row.simpleMovement}
+                  title="Use only Start and End"
+                >
+                  <span className="tm-simple-check">
+                    {row.simpleMovement ? "✓" : ""}
+                  </span>
+                  <span>Simple</span>
+                </button>
               </div>
             ))}
           </div>
@@ -307,7 +337,9 @@ export default function ToolsMovementPage() {
                   >
                     {record.stage === 4
                       ? "Completed"
-                      : `Active ${record.stage}/4`}
+                      : record.simpleMovement
+                        ? "Simple 1/2"
+                        : `Active ${record.stage}/4`}
                   </span>
                   <span className="movementTextDate">
                     {record.step4
@@ -336,7 +368,7 @@ export default function ToolsMovementPage() {
             <div className={ui.drawerHeader}>
               <div>
                 <h2>Active Tools</h2>
-                <p>The large button shows where the tool is now. Tap the next faded button to continue.</p>
+                <p>Normal movements show four points. Simple movements show only Start and End.</p>
               </div>
               <button type="button" className={ui.drawerClose} onClick={() => setShowDrawer(false)}>×</button>
             </div>
@@ -345,20 +377,32 @@ export default function ToolsMovementPage() {
               <div className={ui.empty}>No active tool movements.</div>
             ) : (
               <div className={ui.activeButtonRows}>
-                {activeItems.map((record) => (
-                  <div className={ui.activeButtonRow} key={record.id}>
-                    {([1, 2, 3, 4] as StageNumber[]).map((step) => {
+                {activeItems.map((record) => {
+                  const movementSteps: StageNumber[] = record.simpleMovement
+                    ? [1, 4]
+                    : [1, 2, 3, 4];
+
+                  return (
+                  <div
+                    className={`${ui.activeButtonRow} ${record.simpleMovement ? "tm-simple-stage-row" : ""}`}
+                    key={record.id}
+                  >
+                    {movementSteps.map((step) => {
                       const isPast = step < record.stage;
                       const isCurrent = step === record.stage;
-                      const isNext = step === record.stage + 1;
-                      const isFuture = step > record.stage + 1;
+                      const isNext = record.simpleMovement
+                        ? record.stage === 1 && step === 4
+                        : step === record.stage + 1;
+                      const isFuture = !isPast && !isCurrent && !isNext;
                       const detail = stageDetails(record, step);
                       const currentLocation = detail?.location || record.homeShop;
                       const label = isCurrent
                         ? `${record.tool} • ${shortLocation(currentLocation)}`
                         : isPast
                           ? shortLocation(detail?.location)
-                          : String(step);
+                          : record.simpleMovement && step === 4
+                            ? "End"
+                            : String(step);
 
                       return (
                         <button
@@ -374,7 +418,8 @@ export default function ToolsMovementPage() {
                       );
                     })}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
@@ -399,6 +444,56 @@ export default function ToolsMovementPage() {
         .tools-movement-font-120 .tm-entry-field {
           font-size: 14.4px !important;
           font-weight: 700 !important;
+        }
+
+        .tm-entry-row-with-mode {
+          grid-template-columns:
+            28px
+            minmax(150px, 1.35fr)
+            minmax(120px, 0.8fr)
+            minmax(145px, 1fr)
+            78px !important;
+          min-width: 595px !important;
+        }
+
+        .tm-simple-toggle {
+          width: 78px;
+          min-width: 78px;
+          height: 38px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          background: #ffffff;
+          color: #4b5563;
+          font-size: 11px;
+          font-weight: 800;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .tm-simple-toggle.active {
+          border-color: #16803c;
+          background: #e8f7ed;
+          color: #12652f;
+        }
+
+        .tm-simple-check {
+          width: 17px;
+          height: 17px;
+          display: inline-grid;
+          place-items: center;
+          border: 1px solid currentColor;
+          border-radius: 4px;
+          font-size: 12px;
+          line-height: 1;
+        }
+
+        .tm-simple-stage-row .tm-stage-button {
+          flex: 1 1 50% !important;
+          max-width: none !important;
         }
 
         .tools-movement-font-120 .tm-drawer-open {
@@ -440,6 +535,27 @@ export default function ToolsMovementPage() {
             font-size: 12px !important;
           }
 
+          .tm-entry-row-with-mode {
+            min-width: 0 !important;
+          }
+
+          .tm-entry-row-with-mode > .tm-simple-toggle {
+            flex: 0 0 48px !important;
+            width: 48px !important;
+            min-width: 48px !important;
+            height: 30px !important;
+            padding: 0 3px !important;
+            gap: 2px !important;
+            border-radius: 6px !important;
+            font-size: 8px !important;
+          }
+
+          .tm-entry-row-with-mode > .tm-simple-toggle .tm-simple-check {
+            width: 13px;
+            height: 13px;
+            font-size: 9px;
+          }
+
           .tools-movement-font-120 .tm-main-action,
           .tools-movement-font-120 .tm-filter-button,
           .tools-movement-font-120 .tm-search-input {
@@ -458,6 +574,18 @@ export default function ToolsMovementPage() {
         @media (max-width: 390px) {
           .tools-movement-font-120 .tm-entry-field {
             font-size: 10.8px !important;
+          }
+
+          .tm-entry-row-with-mode > .tm-simple-toggle {
+            flex-basis: 43px !important;
+            width: 43px !important;
+            min-width: 43px !important;
+            font-size: 7.5px !important;
+          }
+
+          .tm-entry-row-with-mode > .tm-simple-toggle .tm-simple-check {
+            width: 12px;
+            height: 12px;
           }
 
           .tools-movement-font-120 .tm-main-action,

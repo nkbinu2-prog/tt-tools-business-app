@@ -1165,41 +1165,63 @@ td input:focus {
 
 .billBottom {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 220px !important;
-  gap: 28px !important;
+  grid-template-columns: minmax(0, 1fr) 430px 220px !important;
+  gap: 24px !important;
   margin-top: 12px !important;
   align-items: start !important;
 }
 
-.billSummary,
-.billFinal {
+.billBottomSpacer {
   grid-column: 1 !important;
 }
 
-.billSummary p,
-.billFinal p {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  margin: 5px 0 !important;
-  font-size: 18px !important;
+.billTotals {
+  grid-column: 2 !important;
+  width: 100% !important;
+  padding-top: 8px !important;
 }
 
-.billSummary span,
-.billFinal span {
+.billTotalLine {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 18px 115px !important;
+  align-items: center !important;
+  column-gap: 6px !important;
+  min-height: 38px !important;
+  font-size: 18px !important;
   font-weight: 900 !important;
 }
 
-.billSummary b,
-.billFinal b {
+.billTotalLabel {
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+
+.billTotalColon {
+  text-align: center !important;
+  font-weight: 900 !important;
+}
+
+.billTotalLine b {
+  text-align: right !important;
   font-size: 22px !important;
   font-weight: 900 !important;
   white-space: nowrap !important;
 }
 
+.billPayableLine {
+  margin-top: 18px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid #d7e3f3 !important;
+}
+
+.billPayableLine .billTotalLabel,
+.billPayableLine b {
+  font-size: 22px !important;
+}
+
 .paymentCard {
-  grid-column: 2 !important;
-  grid-row: 1 / span 2 !important;
+  grid-column: 3 !important;
+  grid-row: 1 !important;
   justify-self: end !important;
   align-self: start !important;
   width: 210px !important;
@@ -1326,18 +1348,22 @@ td input:focus {
 
 .forceDesktopBill .billBottom {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 220px !important;
-  gap: 28px !important;
+  grid-template-columns: minmax(0, 1fr) 430px 220px !important;
+  gap: 24px !important;
   align-items: start !important;
 }
 
-.forceDesktopBill .billSummary p,
-.forceDesktopBill .billFinal p {
+.forceDesktopBill .billTotalLine {
+  grid-template-columns: minmax(0, 1fr) 18px 115px !important;
   font-size: 18px !important;
 }
 
-.forceDesktopBill .billSummary b,
-.forceDesktopBill .billFinal b {
+.forceDesktopBill .billTotalLine b {
+  font-size: 22px !important;
+}
+
+.forceDesktopBill .billPayableLine .billTotalLabel,
+.forceDesktopBill .billPayableLine b {
   font-size: 22px !important;
 }
 
