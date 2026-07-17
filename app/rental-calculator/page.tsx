@@ -630,6 +630,85 @@ ${lines.join("\n")}
     }
   }
 
+  async function downloadJpg() {
+    if (!customerName.trim()) {
+      alert("ഫയൽ നാമത്തിനായി ഉപഭോക്താവിന്റെ പേര് നൽകുക.");
+      return;
+    }
+
+    if (activeRows.length === 0) {
+      alert("ഡൗൺലോഡ് ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
+      return;
+    }
+
+    if (!billRef.current) {
+      alert("Bill not found.");
+      return;
+    }
+
+    const originalBill = billRef.current;
+    const billClone = originalBill.cloneNode(true) as HTMLDivElement;
+
+    billClone.style.position = "fixed";
+    billClone.style.left = "-10000px";
+    billClone.style.top = "0";
+    billClone.style.width = "1200px";
+    billClone.style.minWidth = "1200px";
+    billClone.style.maxWidth = "1200px";
+    billClone.style.transform = "none";
+    billClone.classList.add("forceDesktopBill");
+    billClone.style.background = "#ffffff";
+    billClone.style.zIndex = "999999";
+
+    document.body.appendChild(billClone);
+
+    try {
+      const images = Array.from(billClone.querySelectorAll("img"));
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+
+          return new Promise<void>((resolve) => {
+            const done = () => resolve();
+            img.addEventListener("load", done, { once: true });
+            img.addEventListener("error", done, { once: true });
+          });
+        })
+      );
+
+      const canvas = await html2canvas(billClone, {
+        backgroundColor: "#ffffff",
+        scale: 3,
+        useCORS: true,
+        width: billClone.scrollWidth,
+        height: billClone.scrollHeight,
+        windowWidth: 1200,
+      });
+
+      canvas.toBlob(
+        async (blob) => {
+          if (!blob) return;
+
+          const fileName = billFileName(customerName);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        },
+        "image/jpeg",
+        0.95
+      );
+    } finally {
+      document.body.removeChild(billClone);
+    }
+  }
+
   return (
     <AppShell
       title="Rental Calculator"
@@ -873,14 +952,12 @@ ${lines.join("\n")}
             📂 Saved Drafts
           </button>
 
-          <div className="shareTitle">📤 ഷെയർ ചെയ്യുക</div>
-
           <button className="jpgBtn" onClick={shareJpg}>
             🖼️ JPG ആയി ഷെയർ ചെയ്യുക
           </button>
 
-          <button className="waBtn" onClick={shareText}>
-            💬 WhatsApp-ൽ ഷെയർ ചെയ്യുക
+          <button className="waBtn" onClick={downloadJpg}>
+            🖼️ JPG ഡൗൺലോഡ് ചെയ്യുക
           </button>
 
           <button className="resetBtn" onClick={clearAll}>
@@ -944,7 +1021,7 @@ ${lines.join("\n")}
 
       <div className="billCapture" id="professional-bill" ref={billRef}>
         <div className="billHeader">
-          <img src="/tt-logo-horizontal.png?v=20260717" alt="Tried & True" className="billLogo" />
+          <img src="/tt-logo-horizontal.png" alt="Tried & True" className="billLogo" />
         </div>
 
         <div className="billDate">
