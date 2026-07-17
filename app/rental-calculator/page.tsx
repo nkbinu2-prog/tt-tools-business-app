@@ -944,7 +944,7 @@ ${lines.join("\n")}
 
       <div className="billCapture" id="professional-bill" ref={billRef}>
         <div className="billHeader">
-          <img src="/tt-logo.png" alt="Tried & True" className="billLogo" />
+          <img src="/tt-logo-horizontal.png?v=20260717" alt="Tried & True" className="billLogo" />
         </div>
 
         <div className="billDate">
