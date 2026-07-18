@@ -383,6 +383,7 @@ export default function Home() {
 
   const grandTotal = calculatedRows.reduce((sum, row) => sum + row.amount, 0);
   const openingBalanceAmount = Math.max(Number(openingBalance || 0), 0);
+  const rentWithOpeningBalance = openingBalanceAmount + grandTotal;
   const transportAmount = Math.max(Number(transportCost || 0), 0);
   const discountAmount = Math.max(Number(discount || 0), 0);
   const finalTotal = Math.max(
@@ -887,14 +888,16 @@ ${openingBalanceLine}${lines.join("\n")}
                   ))}
 
 <tr className="totalRow">
-  <td colSpan={3}>ടൂൾസ് വാടക</td>
+  <td colSpan={3}>
+    {openingBalanceAmount > 0 ? "മുൻ ബാലൻസ് + ടൂൾസ് വാടക" : "ടൂൾസ് വാടക"}
+  </td>
   <td>{totalQty}</td>
   <td></td>
   <td></td>
   <td></td>
   <td></td>
   <td></td>
-  <td>₹{formatMoney(grandTotal)}</td>
+  <td>₹{formatMoney(rentWithOpeningBalance)}</td>
 </tr>
                 </tbody>
               </table>
@@ -1131,9 +1134,13 @@ ${openingBalanceLine}${lines.join("\n")}
 
             <tr className="billTotalRow">
               <td colSpan={7} style={{ textAlign: "center", fontWeight: 900 }}>
-                ടൂൾസ് വാടക
+                {openingBalanceAmount > 0
+                  ? "മുൻ ബാലൻസ് + ടൂൾസ് വാടക"
+                  : "ടൂൾസ് വാടക"}
               </td>
-              <td style={{ fontWeight: 900 }}>₹ {formatMoney(grandTotal)}</td>
+              <td style={{ fontWeight: 900 }}>
+                ₹ {formatMoney(rentWithOpeningBalance)}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1142,20 +1149,6 @@ ${openingBalanceLine}${lines.join("\n")}
           <div className="billBottomSpacer" aria-hidden="true" />
 
           <div className="billTotals">
-            {openingBalanceAmount > 0 && (
-              <div className="billTotalLine">
-                <span className="billTotalLabel">മുൻ ബാലൻസ്</span>
-                <span className="billTotalColon">:</span>
-                <b>₹ {formatMoney(openingBalanceAmount)}</b>
-              </div>
-            )}
-
-            <div className="billTotalLine">
-              <span className="billTotalLabel">ടൂൾസ് വാടക</span>
-              <span className="billTotalColon">:</span>
-              <b>₹ {formatMoney(grandTotal)}</b>
-            </div>
-
             {transportAmount > 0 && (
               <div className="billTotalLine">
                 <span className="billTotalLabel">ഗതാഗത ചെലവ്</span>
