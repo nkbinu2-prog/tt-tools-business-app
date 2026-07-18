@@ -143,6 +143,7 @@ function formatMoney(value: number) {
 type SavedDraft = {
   id: string;
   customerName: string;
+  openingBalance?: string;
   transportCost?: string;
   discount: string;
   rows: Row[];
@@ -227,11 +228,13 @@ function makeDraftId(name: string) {
 function hasUsefulData(
   customerName: string,
   rows: Row[],
+  openingBalance: string,
   transportCost: string,
   discount: string
 ) {
   return Boolean(
     customerName.trim() ||
+      openingBalance.trim() ||
       transportCost.trim() ||
       discount.trim() ||
       rows.some((row) => row.tool || row.qty || row.rent || row.from || row.to)
@@ -240,6 +243,7 @@ function hasUsefulData(
 
 export default function Home() {
   const [customerName, setCustomerName] = useState("");
+  const [openingBalance, setOpeningBalance] = useState("");
   const [transportCost, setTransportCost] = useState("");
   const [discount, setDiscount] = useState("");
   const [rows, setRows] = useState<Row[]>(createRows(10));
@@ -353,6 +357,7 @@ export default function Home() {
     if (confirm("എല്ലാം മായ്ക്കണോ?")) {
       setRows(createRows(10));
       setCustomerName("");
+      setOpeningBalance("");
       setTransportCost("");
       setDiscount("");
       setSaveStatus("New calculation");
@@ -377,10 +382,11 @@ export default function Home() {
   );
 
   const grandTotal = calculatedRows.reduce((sum, row) => sum + row.amount, 0);
+  const openingBalanceAmount = Math.max(Number(openingBalance || 0), 0);
   const transportAmount = Math.max(Number(transportCost || 0), 0);
   const discountAmount = Math.max(Number(discount || 0), 0);
   const finalTotal = Math.max(
-    grandTotal + transportAmount - discountAmount,
+    openingBalanceAmount + grandTotal + transportAmount - discountAmount,
     0
   );
 
@@ -391,6 +397,7 @@ export default function Home() {
 
   function restoreDraft(draft: SavedDraft) {
     setCustomerName(draft.customerName || "");
+    setOpeningBalance(draft.openingBalance || "");
     setTransportCost(draft.transportCost || "");
     setDiscount(draft.discount || "");
     setRows(draft.rows && draft.rows.length > 0 ? draft.rows : createRows(10));
@@ -421,12 +428,14 @@ export default function Home() {
           hasUsefulData(
             currentDraft.customerName,
             currentDraft.rows,
+            currentDraft.openingBalance || "",
             currentDraft.transportCost || "",
             currentDraft.discount
           ) &&
           confirm("Previous calculation found. Continue?")
         ) {
           setCustomerName(currentDraft.customerName || "");
+          setOpeningBalance(currentDraft.openingBalance || "");
           setTransportCost(currentDraft.transportCost || "");
           setDiscount(currentDraft.discount || "");
           setRows(currentDraft.rows && currentDraft.rows.length > 0 ? currentDraft.rows : createRows(10));
@@ -450,6 +459,7 @@ export default function Home() {
         const usefulData = hasUsefulData(
           customerName,
           rows,
+          openingBalance,
           transportCost,
           discount
         );
@@ -458,6 +468,7 @@ export default function Home() {
         await putDraft({
           id: CURRENT_DRAFT_ID,
           customerName,
+          openingBalance,
           transportCost,
           discount,
           rows,
@@ -468,6 +479,7 @@ export default function Home() {
           await putDraft({
             id: makeDraftId(customerName),
             customerName: customerName.trim(),
+            openingBalance,
             transportCost,
             discount,
             rows,
@@ -484,7 +496,7 @@ export default function Home() {
     }, 500);
 
     return () => window.clearTimeout(timer);
-  }, [customerName, transportCost, discount, rows, loadedFromDb]);
+  }, [customerName, openingBalance, transportCost, discount, rows, loadedFromDb]);
 
   function buildShareText() {
     const lines = activeRows.map((row, index) => {
@@ -494,6 +506,11 @@ export default function Home() {
         row.amount
       )}`;
     });
+
+    const openingBalanceLine =
+      openingBalanceAmount > 0
+        ? `മുൻ ബാലൻസ്: ₹${formatMoney(openingBalanceAmount)}\n`
+        : "";
 
     const transportLine =
       transportAmount > 0
@@ -509,13 +526,13 @@ export default function Home() {
 
 ഉപഭോക്താവിന്റെ പേര്: ${customerName || "-"}
 
-${lines.join("\n")}
+${openingBalanceLine}${lines.join("\n")}
 
 ടൂൾസ് വാടക: ₹${formatMoney(grandTotal)}${transportLine}${discountLine}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
   }
 
   async function copyCalculation() {
-    if (activeRows.length === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0) {
       alert("കോപ്പി ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -525,7 +542,7 @@ ${lines.join("\n")}
   }
 
   async function shareText() {
-    if (activeRows.length === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0) {
       alert("ഷെയർ ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -549,7 +566,7 @@ ${lines.join("\n")}
       return;
     }
 
-    if (activeRows.length === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0) {
       alert("ഷെയർ ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -636,7 +653,7 @@ ${lines.join("\n")}
       return;
     }
 
-    if (activeRows.length === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0) {
       alert("ഡൗൺലോഡ് ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -906,6 +923,17 @@ ${lines.join("\n")}
           </div>
 
           <div className="costInputStack">
+            <div className="discountBox">
+              <label>മുൻ ബാലൻസ്</label>
+              <input
+                type="number"
+                min="0"
+                value={openingBalance}
+                onChange={(e) => setOpeningBalance(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+
             <div className="discountBox transportBox">
               <label>🚚 ഗതാഗത ചെലവ്</label>
               <input
@@ -928,6 +956,13 @@ ${lines.join("\n")}
               />
             </div>
           </div>
+
+          {openingBalanceAmount > 0 && (
+            <div className="discountLine">
+              <span>മുൻ ബാലൻസ്</span>
+              <strong>₹{formatMoney(openingBalanceAmount)}</strong>
+            </div>
+          )}
 
           {transportAmount > 0 && (
             <div className="discountLine transportLine">
@@ -1060,9 +1095,22 @@ ${lines.join("\n")}
           </thead>
 
           <tbody>
+            {openingBalanceAmount > 0 && (
+              <tr>
+                <td>1</td>
+                <td style={{ fontWeight: 900 }}>മുൻ ബാലൻസ്</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td style={{ fontWeight: 900 }}>₹ {formatMoney(openingBalanceAmount)}</td>
+              </tr>
+            )}
+
             {activeRows.map((row, index) => (
               <tr key={index}>
-                <td>{index + 1}</td>
+                <td>{index + 1 + (openingBalanceAmount > 0 ? 1 : 0)}</td>
                 <td>{row.tool || "-"}</td>
                 <td>{row.qty || "-"}</td>
                 <td>₹ {row.rent || "-"}</td>
@@ -1094,6 +1142,14 @@ ${lines.join("\n")}
           <div className="billBottomSpacer" aria-hidden="true" />
 
           <div className="billTotals">
+            {openingBalanceAmount > 0 && (
+              <div className="billTotalLine">
+                <span className="billTotalLabel">മുൻ ബാലൻസ്</span>
+                <span className="billTotalColon">:</span>
+                <b>₹ {formatMoney(openingBalanceAmount)}</b>
+              </div>
+            )}
+
             <div className="billTotalLine">
               <span className="billTotalLabel">ടൂൾസ് വാടക</span>
               <span className="billTotalColon">:</span>
