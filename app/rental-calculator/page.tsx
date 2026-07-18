@@ -146,6 +146,7 @@ type SavedDraft = {
   openingBalance?: string;
   transportCost?: string;
   discount: string;
+  advance?: string;
   rows: Row[];
   updatedAt: number;
 };
@@ -230,13 +231,15 @@ function hasUsefulData(
   rows: Row[],
   openingBalance: string,
   transportCost: string,
-  discount: string
+  discount: string,
+  advance: string
 ) {
   return Boolean(
     customerName.trim() ||
       openingBalance.trim() ||
       transportCost.trim() ||
       discount.trim() ||
+      advance.trim() ||
       rows.some((row) => row.tool || row.qty || row.rent || row.from || row.to)
   );
 }
@@ -246,6 +249,7 @@ export default function Home() {
   const [openingBalance, setOpeningBalance] = useState("");
   const [transportCost, setTransportCost] = useState("");
   const [discount, setDiscount] = useState("");
+  const [advance, setAdvance] = useState("");
   const [rows, setRows] = useState<Row[]>(createRows(10));
   const [drafts, setDrafts] = useState<SavedDraft[]>([]);
   const [draftSearch, setDraftSearch] = useState("");
@@ -360,6 +364,7 @@ export default function Home() {
       setOpeningBalance("");
       setTransportCost("");
       setDiscount("");
+      setAdvance("");
       setSaveStatus("New calculation");
     }
   }
@@ -386,8 +391,13 @@ export default function Home() {
   const rentWithOpeningBalance = openingBalanceAmount + grandTotal;
   const transportAmount = Math.max(Number(transportCost || 0), 0);
   const discountAmount = Math.max(Number(discount || 0), 0);
+  const advanceAmount = Math.max(Number(advance || 0), 0);
   const finalTotal = Math.max(
-    openingBalanceAmount + grandTotal + transportAmount - discountAmount,
+    openingBalanceAmount +
+      grandTotal +
+      transportAmount -
+      discountAmount -
+      advanceAmount,
     0
   );
 
@@ -401,6 +411,7 @@ export default function Home() {
     setOpeningBalance(draft.openingBalance || "");
     setTransportCost(draft.transportCost || "");
     setDiscount(draft.discount || "");
+    setAdvance(draft.advance || "");
     setRows(draft.rows && draft.rows.length > 0 ? draft.rows : createRows(10));
     setShowDrafts(false);
     setSaveStatus("Draft opened");
@@ -431,7 +442,8 @@ export default function Home() {
             currentDraft.rows,
             currentDraft.openingBalance || "",
             currentDraft.transportCost || "",
-            currentDraft.discount
+            currentDraft.discount,
+            currentDraft.advance || ""
           ) &&
           confirm("Previous calculation found. Continue?")
         ) {
@@ -439,6 +451,7 @@ export default function Home() {
           setOpeningBalance(currentDraft.openingBalance || "");
           setTransportCost(currentDraft.transportCost || "");
           setDiscount(currentDraft.discount || "");
+          setAdvance(currentDraft.advance || "");
           setRows(currentDraft.rows && currentDraft.rows.length > 0 ? currentDraft.rows : createRows(10));
           setSaveStatus("Previous calculation restored");
         }
@@ -462,7 +475,8 @@ export default function Home() {
           rows,
           openingBalance,
           transportCost,
-          discount
+          discount,
+          advance
         );
         const now = Date.now();
 
@@ -472,6 +486,7 @@ export default function Home() {
           openingBalance,
           transportCost,
           discount,
+          advance,
           rows,
           updatedAt: now,
         });
@@ -483,6 +498,7 @@ export default function Home() {
             openingBalance,
             transportCost,
             discount,
+            advance,
             rows,
             updatedAt: now,
           });
@@ -497,7 +513,15 @@ export default function Home() {
     }, 500);
 
     return () => window.clearTimeout(timer);
-  }, [customerName, openingBalance, transportCost, discount, rows, loadedFromDb]);
+  }, [
+    customerName,
+    openingBalance,
+    transportCost,
+    discount,
+    advance,
+    rows,
+    loadedFromDb,
+  ]);
 
   function buildShareText() {
     const lines = activeRows.map((row, index) => {
@@ -523,17 +547,24 @@ export default function Home() {
         ? `\nഡിസ്‌കൗണ്ട്: ₹${formatMoney(discountAmount)}`
         : "";
 
+    const advanceLine =
+      advanceAmount > 0
+        ? `\nഅഡ്വാൻസ്: ₹${formatMoney(advanceAmount)}`
+        : "";
+
     return `Tried & True Rental Calculator
 
 ഉപഭോക്താവിന്റെ പേര്: ${customerName || "-"}
 
 ${openingBalanceLine}${lines.join("\n")}
 
-ടൂൾസ് വാടക: ₹${formatMoney(grandTotal)}${transportLine}${discountLine}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
+ടൂൾസ് വാടക: ₹${formatMoney(
+      grandTotal
+    )}${transportLine}${discountLine}${advanceLine}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
   }
 
   async function copyCalculation() {
-    if (activeRows.length === 0 && openingBalanceAmount === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
       alert("കോപ്പി ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -543,7 +574,7 @@ ${openingBalanceLine}${lines.join("\n")}
   }
 
   async function shareText() {
-    if (activeRows.length === 0 && openingBalanceAmount === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
       alert("ഷെയർ ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -567,7 +598,7 @@ ${openingBalanceLine}${lines.join("\n")}
       return;
     }
 
-    if (activeRows.length === 0 && openingBalanceAmount === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
       alert("ഷെയർ ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -654,7 +685,7 @@ ${openingBalanceLine}${lines.join("\n")}
       return;
     }
 
-    if (activeRows.length === 0 && openingBalanceAmount === 0) {
+    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
       alert("ഡൗൺലോഡ് ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -958,6 +989,17 @@ ${openingBalanceLine}${lines.join("\n")}
                 placeholder="0"
               />
             </div>
+
+            <div className="discountBox">
+              <label>അഡ്വാൻസ്</label>
+              <input
+                type="number"
+                min="0"
+                value={advance}
+                onChange={(e) => setAdvance(e.target.value)}
+                placeholder="0"
+              />
+            </div>
           </div>
 
           {openingBalanceAmount > 0 && (
@@ -978,6 +1020,13 @@ ${openingBalanceLine}${lines.join("\n")}
             <div className="discountLine">
               <span>🎁 ഡിസ്‌കൗണ്ട്</span>
               <strong>− ₹{formatMoney(discountAmount)}</strong>
+            </div>
+          )}
+
+          {advanceAmount > 0 && (
+            <div className="discountLine">
+              <span>അഡ്വാൻസ്</span>
+              <strong>− ₹{formatMoney(advanceAmount)}</strong>
             </div>
           )}
 
@@ -1162,6 +1211,14 @@ ${openingBalanceLine}${lines.join("\n")}
                 <span className="billTotalLabel">ഡിസ്‌കൗണ്ട്</span>
                 <span className="billTotalColon">:</span>
                 <b>− ₹ {formatMoney(discountAmount)}</b>
+              </div>
+            )}
+
+            {advanceAmount > 0 && (
+              <div className="billTotalLine">
+                <span className="billTotalLabel">അഡ്വാൻസ്</span>
+                <span className="billTotalColon">:</span>
+                <b>− ₹ {formatMoney(advanceAmount)}</b>
               </div>
             )}
 
