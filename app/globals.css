@@ -1211,11 +1211,14 @@ td input:focus {
 .billPayableLine {
   margin-top: 18px !important;
   padding-top: 10px !important;
-  border-top: 1px solid #d7e3f3 !important;
+  border-top: 2px solid #d40000 !important;
+  color: #d40000 !important;
 }
 
 .billPayableLine .billTotalLabel,
+.billPayableLine .billTotalColon,
 .billPayableLine b {
+  color: #d40000 !important;
   font-size: 22px !important;
 }
 
