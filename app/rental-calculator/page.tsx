@@ -13,6 +13,12 @@ type Row = {
   to: string;
 };
 
+type PaymentRow = {
+  date: string;
+  amount: string;
+  note: string;
+};
+
 const branches = [
   {
     name: "KARUVANNUR",
@@ -52,6 +58,15 @@ const emptyRow = (): Row => ({
 
 const createRows = (count: number) =>
   Array.from({ length: count }, () => emptyRow());
+
+const emptyPaymentRow = (): PaymentRow => ({
+  date: "",
+  amount: "",
+  note: "",
+});
+
+const createPaymentRows = (count: number) =>
+  Array.from({ length: count }, () => emptyPaymentRow());
 
 function rowHasData(row: Row) {
   return Boolean(row.tool || row.qty || row.rent || row.from || row.to);
@@ -147,6 +162,7 @@ type SavedDraft = {
   transportCost?: string;
   discount: string;
   advance?: string;
+  payments?: PaymentRow[];
   rows: Row[];
   updatedAt: number;
 };
@@ -232,7 +248,8 @@ function hasUsefulData(
   openingBalance: string,
   transportCost: string,
   discount: string,
-  advance: string
+  advance: string,
+  payments: PaymentRow[]
 ) {
   return Boolean(
     customerName.trim() ||
@@ -240,6 +257,7 @@ function hasUsefulData(
       transportCost.trim() ||
       discount.trim() ||
       advance.trim() ||
+      payments.some((payment) => payment.date || payment.amount || payment.note) ||
       rows.some((row) => row.tool || row.qty || row.rent || row.from || row.to)
   );
 }
@@ -250,6 +268,7 @@ export default function Home() {
   const [transportCost, setTransportCost] = useState("");
   const [discount, setDiscount] = useState("");
   const [advance, setAdvance] = useState("");
+  const [payments, setPayments] = useState<PaymentRow[]>(createPaymentRows(1));
   const [rows, setRows] = useState<Row[]>(createRows(10));
   const [drafts, setDrafts] = useState<SavedDraft[]>([]);
   const [draftSearch, setDraftSearch] = useState("");
@@ -272,6 +291,29 @@ export default function Home() {
 
   function addRows() {
     setRows([...rows, ...createRows(5)]);
+  }
+
+  function addPaymentRow() {
+    setPayments((current) => [...current, emptyPaymentRow()]);
+  }
+
+  function updatePaymentRow(
+    index: number,
+    field: keyof PaymentRow,
+    value: string
+  ) {
+    setPayments((current) =>
+      current.map((payment, paymentIndex) =>
+        paymentIndex === index ? { ...payment, [field]: value } : payment
+      )
+    );
+  }
+
+  function removePaymentRow(index: number) {
+    setPayments((current) => {
+      const updated = current.filter((_, paymentIndex) => paymentIndex !== index);
+      return updated.length > 0 ? updated : createPaymentRows(1);
+    });
   }
 
   function copyRowBelow(index: number) {
@@ -365,6 +407,7 @@ export default function Home() {
       setTransportCost("");
       setDiscount("");
       setAdvance("");
+      setPayments(createPaymentRows(1));
       setSaveStatus("New calculation");
     }
   }
@@ -392,12 +435,20 @@ export default function Home() {
   const transportAmount = Math.max(Number(transportCost || 0), 0);
   const discountAmount = Math.max(Number(discount || 0), 0);
   const advanceAmount = Math.max(Number(advance || 0), 0);
+  const activePayments = payments.filter(
+    (payment) => payment.date || Number(payment.amount || 0) > 0 || payment.note
+  );
+  const totalPayments = payments.reduce(
+    (sum, payment) => sum + Math.max(Number(payment.amount || 0), 0),
+    0
+  );
   const finalTotal = Math.max(
     openingBalanceAmount +
       grandTotal +
       transportAmount -
       discountAmount -
-      advanceAmount,
+      advanceAmount -
+      totalPayments,
     0
   );
 
@@ -412,6 +463,11 @@ export default function Home() {
     setTransportCost(draft.transportCost || "");
     setDiscount(draft.discount || "");
     setAdvance(draft.advance || "");
+    setPayments(
+      draft.payments && draft.payments.length > 0
+        ? draft.payments
+        : createPaymentRows(1)
+    );
     setRows(draft.rows && draft.rows.length > 0 ? draft.rows : createRows(10));
     setShowDrafts(false);
     setSaveStatus("Draft opened");
@@ -443,7 +499,8 @@ export default function Home() {
             currentDraft.openingBalance || "",
             currentDraft.transportCost || "",
             currentDraft.discount,
-            currentDraft.advance || ""
+            currentDraft.advance || "",
+            currentDraft.payments || []
           ) &&
           confirm("Previous calculation found. Continue?")
         ) {
@@ -452,6 +509,11 @@ export default function Home() {
           setTransportCost(currentDraft.transportCost || "");
           setDiscount(currentDraft.discount || "");
           setAdvance(currentDraft.advance || "");
+          setPayments(
+            currentDraft.payments && currentDraft.payments.length > 0
+              ? currentDraft.payments
+              : createPaymentRows(1)
+          );
           setRows(currentDraft.rows && currentDraft.rows.length > 0 ? currentDraft.rows : createRows(10));
           setSaveStatus("Previous calculation restored");
         }
@@ -476,7 +538,8 @@ export default function Home() {
           openingBalance,
           transportCost,
           discount,
-          advance
+          advance,
+          payments
         );
         const now = Date.now();
 
@@ -487,6 +550,7 @@ export default function Home() {
           transportCost,
           discount,
           advance,
+          payments,
           rows,
           updatedAt: now,
         });
@@ -519,6 +583,7 @@ export default function Home() {
     transportCost,
     discount,
     advance,
+    payments,
     rows,
     loadedFromDb,
   ]);
@@ -552,6 +617,21 @@ export default function Home() {
         ? `\nഅഡ്വാൻസ്: ₹${formatMoney(advanceAmount)}`
         : "";
 
+    const paymentLines = activePayments
+      .map((payment) => {
+        const amount = Math.max(Number(payment.amount || 0), 0);
+        if (amount <= 0) return "";
+
+        const dateLabel = payment.date
+          ? new Date(payment.date + "T00:00:00").toLocaleDateString("en-IN")
+          : "-";
+        const noteLabel = payment.note.trim() ? ` - ${payment.note.trim()}` : "";
+
+        return `\nവരവ് (${dateLabel})${noteLabel}: ₹${formatMoney(amount)}`;
+      })
+      .filter(Boolean)
+      .join("");
+
     return `Tried & True Rental Calculator
 
 ഉപഭോക്താവിന്റെ പേര്: ${customerName || "-"}
@@ -560,11 +640,16 @@ ${openingBalanceLine}${lines.join("\n")}
 
 ടൂൾസ് വാടക: ₹${formatMoney(
       grandTotal
-    )}${transportLine}${discountLine}${advanceLine}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
+    )}${transportLine}${discountLine}${advanceLine}${paymentLines}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
   }
 
   async function copyCalculation() {
-    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
+    if (
+      activeRows.length === 0 &&
+      openingBalanceAmount === 0 &&
+      advanceAmount === 0 &&
+      totalPayments === 0
+    ) {
       alert("കോപ്പി ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -574,7 +659,12 @@ ${openingBalanceLine}${lines.join("\n")}
   }
 
   async function shareText() {
-    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
+    if (
+      activeRows.length === 0 &&
+      openingBalanceAmount === 0 &&
+      advanceAmount === 0 &&
+      totalPayments === 0
+    ) {
       alert("ഷെയർ ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -598,7 +688,12 @@ ${openingBalanceLine}${lines.join("\n")}
       return;
     }
 
-    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
+    if (
+      activeRows.length === 0 &&
+      openingBalanceAmount === 0 &&
+      advanceAmount === 0 &&
+      totalPayments === 0
+    ) {
       alert("ഷെയർ ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -685,7 +780,12 @@ ${openingBalanceLine}${lines.join("\n")}
       return;
     }
 
-    if (activeRows.length === 0 && openingBalanceAmount === 0 && advanceAmount === 0) {
+    if (
+      activeRows.length === 0 &&
+      openingBalanceAmount === 0 &&
+      advanceAmount === 0 &&
+      totalPayments === 0
+    ) {
       alert("ഡൗൺലോഡ് ചെയ്യാൻ ഡാറ്റ ഇല്ല.");
       return;
     }
@@ -933,6 +1033,133 @@ ${openingBalanceLine}${lines.join("\n")}
                 </tbody>
               </table>
             </div>
+          </section>
+
+          <section
+            style={{
+              marginTop: 10,
+              background: "#ffffff",
+              border: "1px solid #d9e2ef",
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "minmax(150px, 0.8fr) minmax(130px, 0.7fr) minmax(180px, 1.5fr) 70px",
+                background: "#0057ff",
+                color: "#ffffff",
+                fontWeight: 900,
+                textAlign: "center",
+              }}
+            >
+              <div style={{ padding: "10px 8px" }}>തീയതി</div>
+              <div style={{ padding: "10px 8px" }}>വരവ്</div>
+              <div style={{ padding: "10px 8px" }}>കുറിപ്പ്</div>
+              <div style={{ padding: "10px 8px" }}></div>
+            </div>
+
+            {payments.map((payment, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "minmax(150px, 0.8fr) minmax(130px, 0.7fr) minmax(180px, 1.5fr) 70px",
+                  gap: 8,
+                  alignItems: "center",
+                  padding: 8,
+                  borderTop: index === 0 ? "0" : "1px solid #e1e7ef",
+                }}
+              >
+                <input
+                  type="date"
+                  value={payment.date}
+                  onChange={(event) =>
+                    updatePaymentRow(index, "date", event.target.value)
+                  }
+                  style={{
+                    width: "100%",
+                    height: 38,
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 7,
+                    padding: "0 8px",
+                    fontWeight: 700,
+                  }}
+                />
+                <input
+                  type="number"
+                  min="0"
+                  value={payment.amount}
+                  onChange={(event) =>
+                    updatePaymentRow(index, "amount", event.target.value)
+                  }
+                  placeholder="0"
+                  style={{
+                    width: "100%",
+                    height: 38,
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 7,
+                    padding: "0 8px",
+                    textAlign: "center",
+                    fontWeight: 900,
+                  }}
+                />
+                <input
+                  type="text"
+                  value={payment.note}
+                  onChange={(event) =>
+                    updatePaymentRow(index, "note", event.target.value)
+                  }
+                  placeholder="Cash / GPay / Other"
+                  style={{
+                    width: "100%",
+                    height: 38,
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 7,
+                    padding: "0 10px",
+                    fontWeight: 700,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => removePaymentRow(index)}
+                  title="Remove വരവ്"
+                  style={{
+                    height: 38,
+                    border: 0,
+                    borderRadius: 7,
+                    background: "#ef2d2d",
+                    color: "#ffffff",
+                    fontSize: 18,
+                    fontWeight: 900,
+                    cursor: "pointer",
+                  }}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addPaymentRow}
+              style={{
+                width: "100%",
+                minHeight: 42,
+                border: 0,
+                borderTop: "1px solid #d9e2ef",
+                background: "#eaf2ff",
+                color: "#0057ff",
+                fontSize: 15,
+                fontWeight: 900,
+                cursor: "pointer",
+              }}
+            >
+              ➕ വരവ് ചേർക്കുക
+            </button>
           </section>
 
           <div className="tableActions">
@@ -1221,6 +1448,28 @@ ${openingBalanceLine}${lines.join("\n")}
                 <b>− ₹ {formatMoney(advanceAmount)}</b>
               </div>
             )}
+
+            {activePayments.map((payment, index) => {
+              const amount = Math.max(Number(payment.amount || 0), 0);
+              if (amount <= 0) return null;
+
+              const dateLabel = payment.date
+                ? new Date(payment.date + "T00:00:00").toLocaleDateString("en-IN")
+                : "-";
+              const noteLabel = payment.note.trim()
+                ? ` - ${payment.note.trim()}`
+                : "";
+
+              return (
+                <div className="billTotalLine" key={`${payment.date}-${index}`}>
+                  <span className="billTotalLabel">
+                    വരവ് ({dateLabel}){noteLabel}
+                  </span>
+                  <span className="billTotalColon">:</span>
+                  <b>− ₹ {formatMoney(amount)}</b>
+                </div>
+              );
+            })}
 
             <div className="billTotalLine billPayableLine">
               <span className="billTotalLabel">മൊത്തം അടക്കാനുള്ളത്</span>
