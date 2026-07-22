@@ -2,7 +2,7 @@
 
 import html2canvas from "html2canvas";
 import AppShell from "../../components/AppShell";
-import { type PointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, type PointerEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Row = {
   tool: string;
@@ -154,6 +154,102 @@ function formatMoney(value: number) {
   return value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
 }
 
+function downloadBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+  link.style.display = "none";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+
+function calculationFileName(customerName: string) {
+  const d = new Date();
+  const date = [
+    String(d.getDate()).padStart(2, "0"),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    d.getFullYear(),
+  ].join("-");
+
+  const safeCustomerName = customerName
+    .trim()
+    .replace(/[\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, " ");
+
+  return `T&T Rental ${safeCustomerName || "Calculation"} ${date}.ttcalc`;
+}
+
+function normalizeCalculationData(value: unknown): CalculationData | null {
+  if (!value || typeof value !== "object") return null;
+
+  const record = value as Record<string, unknown>;
+  if (!Array.isArray(record.rows)) return null;
+
+  const rows: Row[] = record.rows.map((item) => {
+    const row = item && typeof item === "object"
+      ? (item as Record<string, unknown>)
+      : {};
+
+    return {
+      tool: String(row.tool ?? ""),
+      qty: String(row.qty ?? ""),
+      rent: String(row.rent ?? ""),
+      sundayOff: row.sundayOff !== false,
+      from: String(row.from ?? ""),
+      to: String(row.to ?? ""),
+    };
+  });
+
+  const payments: PaymentRow[] = Array.isArray(record.payments)
+    ? record.payments.map((item) => {
+        const payment = item && typeof item === "object"
+          ? (item as Record<string, unknown>)
+          : {};
+
+        return {
+          date: String(payment.date ?? ""),
+          amount: String(payment.amount ?? ""),
+          note: String(payment.note ?? ""),
+        };
+      })
+    : createPaymentRows(1);
+
+  return {
+    customerName: String(record.customerName ?? ""),
+    openingBalance: String(record.openingBalance ?? ""),
+    transportCost: String(record.transportCost ?? ""),
+    discount: String(record.discount ?? ""),
+    advance: String(record.advance ?? ""),
+    payments: payments.length > 0 ? payments : createPaymentRows(1),
+    rows: rows.length > 0 ? rows : createRows(10),
+  };
+}
+
+
+
+type CalculationData = {
+  customerName: string;
+  openingBalance: string;
+  transportCost: string;
+  discount: string;
+  advance: string;
+  payments: PaymentRow[];
+  rows: Row[];
+};
+
+type CalculationFile = {
+  format: "tt-tools-rental-calculation";
+  version: 1;
+  savedAt: string;
+  data: CalculationData;
+};
 
 type SavedDraft = {
   id: string;
@@ -275,13 +371,57 @@ export default function Home() {
   const [showDrafts, setShowDrafts] = useState(false);
   const [saveStatus, setSaveStatus] = useState("Ready");
   const [loadedFromDb, setLoadedFromDb] = useState(false);
+  const [lastFileSavedSnapshot, setLastFileSavedSnapshot] = useState("");
+  const [fileSaveStatus, setFileSaveStatus] = useState("Bill file not saved");
   const [qrSrc, setQrSrc] = useState("/gpay-qr.png");
   const [draggingRowIndex, setDraggingRowIndex] = useState<number | null>(null);
   const [dragOverRowIndex, setDragOverRowIndex] = useState<number | null>(null);
 
   const billRef = useRef<HTMLDivElement | null>(null);
+  const calculationFileInputRef = useRef<HTMLInputElement | null>(null);
   const dragSourceIndexRef = useRef<number | null>(null);
   const dragTargetIndexRef = useRef<number | null>(null);
+
+
+
+  const calculationData = useMemo<CalculationData>(
+    () => ({
+      customerName,
+      openingBalance,
+      transportCost,
+      discount,
+      advance,
+      payments,
+      rows,
+    }),
+    [
+      customerName,
+      openingBalance,
+      transportCost,
+      discount,
+      advance,
+      payments,
+      rows,
+    ]
+  );
+
+  const calculationSnapshot = useMemo(
+    () => JSON.stringify(calculationData),
+    [calculationData]
+  );
+
+  const hasCurrentCalculationData = hasUsefulData(
+    customerName,
+    rows,
+    openingBalance,
+    transportCost,
+    discount,
+    advance,
+    payments
+  );
+
+  const hasUnsavedFileChanges =
+    hasCurrentCalculationData && calculationSnapshot !== lastFileSavedSnapshot;
 
   function updateRow(index: number, field: keyof Row, value: string | boolean) {
     const copy = [...rows];
@@ -399,8 +539,86 @@ export default function Home() {
     setDragOverRowIndex(null);
   }
 
+
+
+  function downloadCalculationFile() {
+    if (!hasCurrentCalculationData) {
+      alert("Save ചെയ്യാൻ calculation details ഇല്ല.");
+      return false;
+    }
+
+    const payload: CalculationFile = {
+      format: "tt-tools-rental-calculation",
+      version: 1,
+      savedAt: new Date().toISOString(),
+      data: calculationData,
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json;charset=utf-8",
+    });
+
+    downloadBlob(blob, calculationFileName(customerName));
+    setLastFileSavedSnapshot(calculationSnapshot);
+    setFileSaveStatus("✓ Bill file saved");
+    return true;
+  }
+
+  function confirmSaveBeforeContinuing(actionText: string) {
+    if (!hasUnsavedFileChanges) return true;
+
+    const saveFirst = confirm(
+      `Current calculation is not saved as a file. Save it before ${actionText}?`
+    );
+
+    if (saveFirst) return downloadCalculationFile();
+
+    return confirm(`Continue ${actionText} without saving the bill file?`);
+  }
+
+  function requestOpenCalculationFile() {
+    if (!confirmSaveBeforeContinuing("opening another bill")) return;
+    calculationFileInputRef.current?.click();
+  }
+
+  async function openCalculationFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text()) as unknown;
+      const root = parsed && typeof parsed === "object"
+        ? (parsed as Record<string, unknown>)
+        : null;
+      const candidate = root && "data" in root ? root.data : parsed;
+      const data = normalizeCalculationData(candidate);
+
+      if (!data) throw new Error("Invalid calculation file");
+
+      setCustomerName(data.customerName);
+      setOpeningBalance(data.openingBalance);
+      setTransportCost(data.transportCost);
+      setDiscount(data.discount);
+      setAdvance(data.advance);
+      setPayments(data.payments);
+      setRows(data.rows);
+      setLastFileSavedSnapshot(JSON.stringify(data));
+      setFileSaveStatus(`✓ Opened: ${file.name}`);
+      setSaveStatus("Bill file opened");
+      setShowDrafts(false);
+    } catch (error) {
+      console.error("Failed to open bill file", error);
+      alert("This is not a valid T&T Rental bill file.");
+    }
+  }
+
+
   function clearAll() {
-    if (confirm("എല്ലാം മായ്ക്കണോ?")) {
+    if (!confirm("എല്ലാം മായ്ക്കണോ?")) return;
+    if (!confirmSaveBeforeContinuing("starting a new calculation")) return;
+
+    {
       setRows(createRows(10));
       setCustomerName("");
       setOpeningBalance("");
@@ -408,6 +626,8 @@ export default function Home() {
       setDiscount("");
       setAdvance("");
       setPayments(createPaymentRows(1));
+      setLastFileSavedSnapshot("");
+      setFileSaveStatus("Bill file not saved");
       setSaveStatus("New calculation");
     }
   }
@@ -458,6 +678,8 @@ export default function Home() {
   }
 
   function restoreDraft(draft: SavedDraft) {
+    if (!confirmSaveBeforeContinuing("opening the saved draft")) return;
+
     setCustomerName(draft.customerName || "");
     setOpeningBalance(draft.openingBalance || "");
     setTransportCost(draft.transportCost || "");
@@ -469,6 +691,8 @@ export default function Home() {
         : createPaymentRows(1)
     );
     setRows(draft.rows && draft.rows.length > 0 ? draft.rows : createRows(10));
+    setLastFileSavedSnapshot("");
+    setFileSaveStatus("Draft opened — save as file");
     setShowDrafts(false);
     setSaveStatus("Draft opened");
   }
@@ -563,6 +787,7 @@ export default function Home() {
             transportCost,
             discount,
             advance,
+            payments,
             rows,
             updatedAt: now,
           });
@@ -587,6 +812,18 @@ export default function Home() {
     rows,
     loadedFromDb,
   ]);
+
+
+  useEffect(() => {
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      if (!hasUnsavedFileChanges) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", warnBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
+  }, [hasUnsavedFileChanges]);
 
   function buildShareText() {
     const lines = activeRows.map((row, index) => {
@@ -683,6 +920,8 @@ ${openingBalanceLine}${lines.join("\n")}
   }
 
   async function shareJpg() {
+    if (!confirmSaveBeforeContinuing("sharing the JPG")) return;
+
     if (!customerName.trim()) {
       alert("ഫയൽ നാമത്തിനായി ഉപഭോക്താവിന്റെ പേര് നൽകുക.");
       return;
@@ -775,6 +1014,8 @@ ${openingBalanceLine}${lines.join("\n")}
   }
 
   async function downloadJpg() {
+    if (!confirmSaveBeforeContinuing("downloading the JPG")) return;
+
     if (!customerName.trim()) {
       alert("ഫയൽ നാമത്തിനായി ഉപഭോക്താവിന്റെ പേര് നൽകുക.");
       return;
@@ -1260,6 +1501,31 @@ ${openingBalanceLine}${lines.join("\n")}
           <div className="grandCard">
             <span>🧾 മൊത്തം അടക്കാനുള്ളത്</span>
             <strong>₹{formatMoney(finalTotal)}</strong>
+          </div>
+
+
+          <button className="fileSaveBtn" onClick={downloadCalculationFile}>
+            💾 Save Bill File
+          </button>
+
+          <button className="fileOpenBtn" onClick={requestOpenCalculationFile}>
+            📂 Open Saved Bill
+          </button>
+
+          <input
+            ref={calculationFileInputRef}
+            className="calculationFileInput"
+            type="file"
+            accept=".ttcalc,.json,application/json"
+            onChange={openCalculationFile}
+          />
+
+          <div
+            className={`fileSaveStatus ${
+              hasUnsavedFileChanges ? "unsaved" : "saved"
+            }`}
+          >
+            {hasUnsavedFileChanges ? "⚠ Save bill file before leaving" : fileSaveStatus}
           </div>
 
           <button className="draftBtn" onClick={() => setShowDrafts(true)}>

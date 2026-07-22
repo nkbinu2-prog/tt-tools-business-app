@@ -1596,3 +1596,76 @@ td input:focus {
 .calculatorBackButton:active {
   transform: scale(0.97);
 }
+
+
+/* ===========================
+   SAVE / OPEN BILL FILE
+=========================== */
+.fileSaveBtn,
+.fileOpenBtn {
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  min-height: 54px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.fileSaveBtn {
+  background: #7c3aed;
+}
+
+.fileOpenBtn {
+  background: #0f766e;
+}
+
+.calculationFileInput {
+  display: none;
+}
+
+.fileSaveStatus {
+  margin-top: -5px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.fileSaveStatus.saved {
+  background: rgba(34, 197, 94, 0.18);
+  color: #dcfce7;
+}
+
+.fileSaveStatus.unsaved {
+  background: rgba(250, 204, 21, 0.18);
+  color: #fde047;
+}
+
+@media (max-width: 950px) and (orientation: landscape) {
+  .fileSaveBtn,
+  .fileOpenBtn {
+    min-height: 35px;
+    font-size: 11px;
+  }
+
+  .fileSaveStatus {
+    font-size: 9px;
+    padding: 4px 5px;
+  }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .fileSaveBtn,
+  .fileOpenBtn {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .fileSaveStatus {
+    font-size: 10px;
+  }
+}
