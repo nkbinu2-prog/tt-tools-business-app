@@ -19,6 +19,12 @@ type PaymentRow = {
   note: string;
 };
 
+type TransportRow = {
+  date: string;
+  place: string;
+  amount: string;
+};
+
 const branches = [
   {
     name: "KARUVANNUR",
@@ -67,6 +73,15 @@ const emptyPaymentRow = (): PaymentRow => ({
 
 const createPaymentRows = (count: number) =>
   Array.from({ length: count }, () => emptyPaymentRow());
+
+const emptyTransportRow = (): TransportRow => ({
+  date: "",
+  place: "",
+  amount: "",
+});
+
+const createTransportRows = (count: number) =>
+  Array.from({ length: count }, () => emptyTransportRow());
 
 function rowHasData(row: Row) {
   return Boolean(row.tool || row.qty || row.rent || row.from || row.to);
@@ -183,7 +198,7 @@ function calculationFileName(customerName: string) {
     .replace(/[\/:*?"<>|]/g, "-")
     .replace(/\s+/g, " ");
 
-  return `T&T Rental ${safeCustomerName || "Calculation"} ${date}.ttcalc`;
+  return `${date} - ${safeCustomerName || "Calculation"}.ttcalc`;
 }
 
 function normalizeCalculationData(value: unknown): CalculationData | null {
@@ -221,10 +236,26 @@ function normalizeCalculationData(value: unknown): CalculationData | null {
       })
     : createPaymentRows(1);
 
+  const transports: TransportRow[] = Array.isArray(record.transports)
+    ? record.transports.map((item) => {
+        const transport = item && typeof item === "object"
+          ? (item as Record<string, unknown>)
+          : {};
+
+        return {
+          date: String(transport.date ?? ""),
+          place: String(transport.place ?? ""),
+          amount: String(transport.amount ?? ""),
+        };
+      })
+    : Number(record.transportCost || 0) > 0
+      ? [{ date: "", place: "", amount: String(record.transportCost) }]
+      : createTransportRows(1);
+
   return {
     customerName: String(record.customerName ?? ""),
     openingBalance: String(record.openingBalance ?? ""),
-    transportCost: String(record.transportCost ?? ""),
+    transports: transports.length > 0 ? transports : createTransportRows(1),
     discount: String(record.discount ?? ""),
     advance: String(record.advance ?? ""),
     payments: payments.length > 0 ? payments : createPaymentRows(1),
@@ -237,7 +268,7 @@ function normalizeCalculationData(value: unknown): CalculationData | null {
 type CalculationData = {
   customerName: string;
   openingBalance: string;
-  transportCost: string;
+  transports: TransportRow[];
   discount: string;
   advance: string;
   payments: PaymentRow[];
@@ -256,6 +287,7 @@ type SavedDraft = {
   customerName: string;
   openingBalance?: string;
   transportCost?: string;
+  transports?: TransportRow[];
   discount: string;
   advance?: string;
   payments?: PaymentRow[];
@@ -342,7 +374,7 @@ function hasUsefulData(
   customerName: string,
   rows: Row[],
   openingBalance: string,
-  transportCost: string,
+  transports: TransportRow[],
   discount: string,
   advance: string,
   payments: PaymentRow[]
@@ -350,7 +382,7 @@ function hasUsefulData(
   return Boolean(
     customerName.trim() ||
       openingBalance.trim() ||
-      transportCost.trim() ||
+      transports.some((transport) => transport.date || transport.place || transport.amount) ||
       discount.trim() ||
       advance.trim() ||
       payments.some((payment) => payment.date || payment.amount || payment.note) ||
@@ -361,7 +393,7 @@ function hasUsefulData(
 export default function Home() {
   const [customerName, setCustomerName] = useState("");
   const [openingBalance, setOpeningBalance] = useState("");
-  const [transportCost, setTransportCost] = useState("");
+  const [transports, setTransports] = useState<TransportRow[]>(createTransportRows(1));
   const [discount, setDiscount] = useState("");
   const [advance, setAdvance] = useState("");
   const [payments, setPayments] = useState<PaymentRow[]>(createPaymentRows(1));
@@ -388,7 +420,7 @@ export default function Home() {
     () => ({
       customerName,
       openingBalance,
-      transportCost,
+      transports,
       discount,
       advance,
       payments,
@@ -397,7 +429,7 @@ export default function Home() {
     [
       customerName,
       openingBalance,
-      transportCost,
+      transports,
       discount,
       advance,
       payments,
@@ -414,7 +446,7 @@ export default function Home() {
     customerName,
     rows,
     openingBalance,
-    transportCost,
+    transports,
     discount,
     advance,
     payments
@@ -435,6 +467,29 @@ export default function Home() {
 
   function addPaymentRow() {
     setPayments((current) => [...current, emptyPaymentRow()]);
+  }
+
+  function addTransportRow() {
+    setTransports((current) => [...current, emptyTransportRow()]);
+  }
+
+  function updateTransportRow(
+    index: number,
+    field: keyof TransportRow,
+    value: string
+  ) {
+    setTransports((current) =>
+      current.map((transport, transportIndex) =>
+        transportIndex === index ? { ...transport, [field]: value } : transport
+      )
+    );
+  }
+
+  function removeTransportRow(index: number) {
+    setTransports((current) => {
+      const updated = current.filter((_, transportIndex) => transportIndex !== index);
+      return updated.length > 0 ? updated : createTransportRows(1);
+    });
   }
 
   function updatePaymentRow(
@@ -541,7 +596,7 @@ export default function Home() {
 
 
 
-  function downloadCalculationFile() {
+  async function downloadCalculationFile() {
     if (!hasCurrentCalculationData) {
       alert("Save ചെയ്യാൻ calculation details ഇല്ല.");
       return false;
@@ -558,26 +613,79 @@ export default function Home() {
       type: "application/json;charset=utf-8",
     });
 
-    downloadBlob(blob, calculationFileName(customerName));
-    setLastFileSavedSnapshot(calculationSnapshot);
-    setFileSaveStatus("✓ Bill file saved");
-    return true;
+    const fileName = calculationFileName(customerName);
+    const savePickerWindow = window as typeof window & {
+      showSaveFilePicker?: (options: {
+        suggestedName: string;
+        types: Array<{
+          description: string;
+          accept: Record<string, string[]>;
+        }>;
+      }) => Promise<{
+        createWritable: () => Promise<{
+          write: (data: Blob) => Promise<void>;
+          close: () => Promise<void>;
+        }>;
+      }>;
+    };
+
+    try {
+      if (savePickerWindow.showSaveFilePicker) {
+        const fileHandle = await savePickerWindow.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [
+            {
+              description: "T&T Rental Calculator File",
+              accept: { "application/json": [".ttcalc"] },
+            },
+          ],
+        });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } else {
+        const file = new File([blob], fileName, {
+          type: "application/json;charset=utf-8",
+        });
+
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({
+            title: fileName.replace(/\.ttcalc$/i, ""),
+            files: [file],
+          });
+        } else {
+          downloadBlob(blob, fileName);
+        }
+      }
+
+      setLastFileSavedSnapshot(calculationSnapshot);
+      setFileSaveStatus(`✓ Saved: ${fileName}`);
+      return true;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return false;
+      }
+
+      console.error("Failed to save bill file", error);
+      alert("Bill file save ചെയ്യാൻ കഴിഞ്ഞില്ല.");
+      return false;
+    }
   }
 
-  function confirmSaveBeforeContinuing(actionText: string) {
+  async function confirmSaveBeforeContinuing(actionText: string) {
     if (!hasUnsavedFileChanges) return true;
 
     const saveFirst = confirm(
       `Current calculation is not saved as a file. Save it before ${actionText}?`
     );
 
-    if (saveFirst) return downloadCalculationFile();
+    if (saveFirst) return await downloadCalculationFile();
 
     return confirm(`Continue ${actionText} without saving the bill file?`);
   }
 
-  function requestOpenCalculationFile() {
-    if (!confirmSaveBeforeContinuing("opening another bill")) return;
+  async function requestOpenCalculationFile() {
+    if (!(await confirmSaveBeforeContinuing("opening another bill"))) return;
     calculationFileInputRef.current?.click();
   }
 
@@ -598,7 +706,7 @@ export default function Home() {
 
       setCustomerName(data.customerName);
       setOpeningBalance(data.openingBalance);
-      setTransportCost(data.transportCost);
+      setTransports(data.transports);
       setDiscount(data.discount);
       setAdvance(data.advance);
       setPayments(data.payments);
@@ -614,15 +722,15 @@ export default function Home() {
   }
 
 
-  function clearAll() {
+  async function clearAll() {
     if (!confirm("എല്ലാം മായ്ക്കണോ?")) return;
-    if (!confirmSaveBeforeContinuing("starting a new calculation")) return;
+    if (!(await confirmSaveBeforeContinuing("starting a new calculation"))) return;
 
     {
       setRows(createRows(10));
       setCustomerName("");
       setOpeningBalance("");
-      setTransportCost("");
+      setTransports(createTransportRows(1));
       setDiscount("");
       setAdvance("");
       setPayments(createPaymentRows(1));
@@ -652,7 +760,14 @@ export default function Home() {
   const grandTotal = calculatedRows.reduce((sum, row) => sum + row.amount, 0);
   const openingBalanceAmount = Math.max(Number(openingBalance || 0), 0);
   const rentWithOpeningBalance = openingBalanceAmount + grandTotal;
-  const transportAmount = Math.max(Number(transportCost || 0), 0);
+  const activeTransports = transports.filter(
+    (transport) =>
+      transport.date || transport.place || Number(transport.amount || 0) > 0
+  );
+  const transportAmount = transports.reduce(
+    (sum, transport) => sum + Math.max(Number(transport.amount || 0), 0),
+    0
+  );
   const discountAmount = Math.max(Number(discount || 0), 0);
   const advanceAmount = Math.max(Number(advance || 0), 0);
   const activePayments = payments.filter(
@@ -677,12 +792,18 @@ export default function Home() {
     setDrafts(savedDrafts);
   }
 
-  function restoreDraft(draft: SavedDraft) {
-    if (!confirmSaveBeforeContinuing("opening the saved draft")) return;
+  async function restoreDraft(draft: SavedDraft) {
+    if (!(await confirmSaveBeforeContinuing("opening the saved draft"))) return;
 
     setCustomerName(draft.customerName || "");
     setOpeningBalance(draft.openingBalance || "");
-    setTransportCost(draft.transportCost || "");
+    setTransports(
+      draft.transports && draft.transports.length > 0
+        ? draft.transports
+        : Number(draft.transportCost || 0) > 0
+          ? [{ date: "", place: "", amount: String(draft.transportCost) }]
+          : createTransportRows(1)
+    );
     setDiscount(draft.discount || "");
     setAdvance(draft.advance || "");
     setPayments(
@@ -721,7 +842,11 @@ export default function Home() {
             currentDraft.customerName,
             currentDraft.rows,
             currentDraft.openingBalance || "",
-            currentDraft.transportCost || "",
+            currentDraft.transports && currentDraft.transports.length > 0
+              ? currentDraft.transports
+              : Number(currentDraft.transportCost || 0) > 0
+                ? [{ date: "", place: "", amount: String(currentDraft.transportCost) }]
+                : createTransportRows(1),
             currentDraft.discount,
             currentDraft.advance || "",
             currentDraft.payments || []
@@ -730,7 +855,13 @@ export default function Home() {
         ) {
           setCustomerName(currentDraft.customerName || "");
           setOpeningBalance(currentDraft.openingBalance || "");
-          setTransportCost(currentDraft.transportCost || "");
+          setTransports(
+            currentDraft.transports && currentDraft.transports.length > 0
+              ? currentDraft.transports
+              : Number(currentDraft.transportCost || 0) > 0
+                ? [{ date: "", place: "", amount: String(currentDraft.transportCost) }]
+                : createTransportRows(1)
+          );
           setDiscount(currentDraft.discount || "");
           setAdvance(currentDraft.advance || "");
           setPayments(
@@ -760,7 +891,7 @@ export default function Home() {
           customerName,
           rows,
           openingBalance,
-          transportCost,
+          transports,
           discount,
           advance,
           payments
@@ -771,7 +902,7 @@ export default function Home() {
           id: CURRENT_DRAFT_ID,
           customerName,
           openingBalance,
-          transportCost,
+          transports,
           discount,
           advance,
           payments,
@@ -784,7 +915,7 @@ export default function Home() {
             id: makeDraftId(customerName),
             customerName: customerName.trim(),
             openingBalance,
-            transportCost,
+            transports,
             discount,
             advance,
             payments,
@@ -805,7 +936,7 @@ export default function Home() {
   }, [
     customerName,
     openingBalance,
-    transportCost,
+    transports,
     discount,
     advance,
     payments,
@@ -839,10 +970,22 @@ export default function Home() {
         ? `മുൻ ബാലൻസ്: ₹${formatMoney(openingBalanceAmount)}\n`
         : "";
 
-    const transportLine =
-      transportAmount > 0
-        ? `\nഗതാഗത ചെലവ്: ₹${formatMoney(transportAmount)}`
-        : "";
+    const transportLines = activeTransports
+      .map((transport) => {
+        const amount = Math.max(Number(transport.amount || 0), 0);
+        if (amount <= 0) return "";
+
+        const dateLabel = transport.date
+          ? new Date(transport.date + "T00:00:00").toLocaleDateString("en-IN")
+          : "-";
+        const placeLabel = transport.place.trim()
+          ? ` - ${transport.place.trim()}`
+          : "";
+
+        return `\nഗതാഗത ചെലവ് (${dateLabel})${placeLabel}: ₹${formatMoney(amount)}`;
+      })
+      .filter(Boolean)
+      .join("");
 
     const discountLine =
       discountAmount > 0
@@ -877,7 +1020,7 @@ ${openingBalanceLine}${lines.join("\n")}
 
 ടൂൾസ് വാടക: ₹${formatMoney(
       grandTotal
-    )}${transportLine}${discountLine}${advanceLine}${paymentLines}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
+    )}${discountLine}${advanceLine}${paymentLines}${transportLines}\nമൊത്തം അടക്കാനുള്ളത്: ₹${formatMoney(finalTotal)}`;
   }
 
   async function copyCalculation() {
@@ -920,7 +1063,7 @@ ${openingBalanceLine}${lines.join("\n")}
   }
 
   async function shareJpg() {
-    if (!confirmSaveBeforeContinuing("sharing the JPG")) return;
+    if (!(await confirmSaveBeforeContinuing("sharing the JPG"))) return;
 
     if (!customerName.trim()) {
       alert("ഫയൽ നാമത്തിനായി ഉപഭോക്താവിന്റെ പേര് നൽകുക.");
@@ -1014,7 +1157,7 @@ ${openingBalanceLine}${lines.join("\n")}
   }
 
   async function downloadJpg() {
-    if (!confirmSaveBeforeContinuing("downloading the JPG")) return;
+    if (!(await confirmSaveBeforeContinuing("downloading the JPG"))) return;
 
     if (!customerName.trim()) {
       alert("ഫയൽ നാമത്തിനായി ഉപഭോക്താവിന്റെ പേര് നൽകുക.");
@@ -1436,17 +1579,6 @@ ${openingBalanceLine}${lines.join("\n")}
               />
             </div>
 
-            <div className="discountBox transportBox">
-              <label>🚚 ഗതാഗത ചെലവ്</label>
-              <input
-                type="number"
-                min="0"
-                value={transportCost}
-                onChange={(e) => setTransportCost(e.target.value)}
-                placeholder="0"
-              />
-            </div>
-
             <div className="discountBox">
               <label>🎁 ഡിസ്‌കൗണ്ട്</label>
               <input
@@ -1477,13 +1609,6 @@ ${openingBalanceLine}${lines.join("\n")}
             </div>
           )}
 
-          {transportAmount > 0 && (
-            <div className="discountLine transportLine">
-              <span>🚚 ഗതാഗത ചെലവ്</span>
-              <strong>₹{formatMoney(transportAmount)}</strong>
-            </div>
-          )}
-
           {discountAmount > 0 && (
             <div className="discountLine">
               <span>🎁 ഡിസ്‌കൗണ്ട്</span>
@@ -1497,6 +1622,62 @@ ${openingBalanceLine}${lines.join("\n")}
               <strong>− ₹{formatMoney(advanceAmount)}</strong>
             </div>
           )}
+
+          <section className="transportEntryBox">
+            <div className="transportEntryTitle">🚚 ഗതാഗത ചെലവ്</div>
+            {transports.map((transport, index) => (
+              <div className="transportEntryRow" key={index}>
+                <input
+                  type="date"
+                  value={transport.date}
+                  onChange={(event) =>
+                    updateTransportRow(index, "date", event.target.value)
+                  }
+                  aria-label="Transport date"
+                />
+                <input
+                  type="text"
+                  value={transport.place}
+                  onChange={(event) =>
+                    updateTransportRow(index, "place", event.target.value)
+                  }
+                  placeholder="സ്ഥലം"
+                  aria-label="Transport place"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  value={transport.amount}
+                  onChange={(event) =>
+                    updateTransportRow(index, "amount", event.target.value)
+                  }
+                  placeholder="തുക"
+                  aria-label="Transport amount"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeTransportRow(index)}
+                  title="Remove transport"
+                  aria-label="Remove transport"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="addTransportBtn"
+              onClick={addTransportRow}
+            >
+              ➕ ഗതാഗതം ചേർക്കുക
+            </button>
+            {transportAmount > 0 && (
+              <div className="transportEntryTotal">
+                <span>ഗതാഗതം ആകെ</span>
+                <strong>₹{formatMoney(transportAmount)}</strong>
+              </div>
+            )}
+          </section>
 
           <div className="grandCard">
             <span>🧾 മൊത്തം അടക്കാനുള്ളത്</span>
@@ -1691,14 +1872,6 @@ ${openingBalanceLine}${lines.join("\n")}
           <div className="billBottomSpacer" aria-hidden="true" />
 
           <div className="billTotals">
-            {transportAmount > 0 && (
-              <div className="billTotalLine">
-                <span className="billTotalLabel">ഗതാഗത ചെലവ്</span>
-                <span className="billTotalColon">:</span>
-                <b>₹ {formatMoney(transportAmount)}</b>
-              </div>
-            )}
-
             {discountAmount > 0 && (
               <div className="billTotalLine">
                 <span className="billTotalLabel">ഡിസ്‌കൗണ്ട്</span>
@@ -1733,6 +1906,28 @@ ${openingBalanceLine}${lines.join("\n")}
                   </span>
                   <span className="billTotalColon">:</span>
                   <b>− ₹ {formatMoney(amount)}</b>
+                </div>
+              );
+            })}
+
+            {activeTransports.map((transport, index) => {
+              const amount = Math.max(Number(transport.amount || 0), 0);
+              if (amount <= 0) return null;
+
+              const dateLabel = transport.date
+                ? new Date(transport.date + "T00:00:00").toLocaleDateString("en-IN")
+                : "-";
+              const placeLabel = transport.place.trim()
+                ? ` - ${transport.place.trim()}`
+                : "";
+
+              return (
+                <div className="billTotalLine billTransportLine" key={`${transport.date}-${transport.place}-${index}`}>
+                  <span className="billTotalLabel">
+                    ഗതാഗത ചെലവ് ({dateLabel}){placeLabel}
+                  </span>
+                  <span className="billTotalColon">:</span>
+                  <b>₹ {formatMoney(amount)}</b>
                 </div>
               );
             })}
@@ -1780,4 +1975,3 @@ ${openingBalanceLine}${lines.join("\n")}
   );
   
 }
-
