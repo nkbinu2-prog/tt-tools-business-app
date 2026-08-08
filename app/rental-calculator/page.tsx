@@ -1785,11 +1785,6 @@ ${openingBalanceLine}${lines.join("\n")}
           <img src="/tt-logo-horizontal.png" alt="Tried & True" className="billLogo" />
         </div>
 
-        <div className="billDate">
-          <strong>Date :</strong>
-          <span>{todayText()}</span>
-        </div>
-
         <div className="branchGrid">
           {branches.map((b) => (
             <div className="branchCard" key={b.name}>
@@ -1801,9 +1796,16 @@ ${openingBalanceLine}${lines.join("\n")}
         </div>
 
         <div className="billCustomer">
-          <strong>ഉപഭോക്താവിന്റെ പേര്</strong>
-          <span>:</span>
-          <b>{customerName || "-"}</b>
+          <div className="billCustomerLeft">
+            <strong>ഉപഭോക്താവിന്റെ പേര്</strong>
+            <span>:</span>
+            <b>{customerName || "-"}</b>
+          </div>
+
+          <div className="billDate">
+            <strong>Date :</strong>
+            <span>{todayText()}</span>
+          </div>
         </div>
 
         <table className="billTable">
@@ -1869,6 +1871,24 @@ ${openingBalanceLine}${lines.join("\n")}
         </table>
 
         <div className="billBottom">
+          <div className="paymentCard">
+            <div className="paymentHead">
+              <span>GPay :</span>
+              <strong>9544011404</strong>
+            </div>
+            <img
+              src={qrSrc}
+              alt="GPay QR Code"
+              className="paymentQr"
+              crossOrigin="anonymous"
+              onError={() => {
+                if (qrSrc !== "/gpay-qr.png") {
+                  setQrSrc("/gpay-qr.png");
+                }
+              }}
+            />
+          </div>
+
           <div className="billBottomSpacer" aria-hidden="true" />
 
           <div className="billTotals">
@@ -1939,23 +1959,6 @@ ${openingBalanceLine}${lines.join("\n")}
             </div>
           </div>
 
-          <div className="paymentCard">
-            <div className="paymentHead">
-              <span>GPay :</span>
-              <strong>9544011404</strong>
-            </div>
-            <img
-              src={qrSrc}
-              alt="GPay QR Code"
-              className="paymentQr"
-              crossOrigin="anonymous"
-              onError={() => {
-                if (qrSrc !== "/gpay-qr.png") {
-                  setQrSrc("/gpay-qr.png");
-                }
-              }}
-            />
-          </div>
         </div>
 
         <div className="billCreated">

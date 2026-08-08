@@ -1795,3 +1795,208 @@ td input:focus {
 .billTransportLine b {
   font-size: 20px !important;
 }
+
+
+/* =========================================================
+   UMBRELLA RENTAL CALCULATOR - FINAL BILL MATCH
+   Mirrors the finished standalone calculator layout only.
+========================================================= */
+
+/* Keep bill at original proportions: no scaling/squeezing */
+.billCapture,
+.forceDesktopBill {
+  transform: none !important;
+  scale: 1 !important;
+}
+
+/* Customer left + date extreme right on the same line */
+.billCustomer,
+.forceDesktopBill .billCustomer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 12px !important;
+}
+
+.billCustomerLeft,
+.forceDesktopBill .billCustomerLeft {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.billCustomer > .billDate,
+.forceDesktopBill .billCustomer > .billDate {
+  margin-left: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+}
+
+/* Bottom area: QR left at bottom, totals right */
+.billBottom,
+.forceDesktopBill .billBottom {
+  display: grid !important;
+  grid-template-columns: 220px minmax(0, 1fr) 560px !important;
+  gap: 20px !important;
+  align-items: end !important;
+}
+
+.paymentCard,
+.forceDesktopBill .paymentCard {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+  align-self: end !important;
+  width: 210px !important;
+  margin: 0 !important;
+}
+
+.billBottomSpacer,
+.forceDesktopBill .billBottomSpacer {
+  grid-column: 2 !important;
+}
+
+.billTotals,
+.forceDesktopBill .billTotals {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  width: 560px !important;
+  max-width: 560px !important;
+  justify-self: end !important;
+  align-self: end !important;
+}
+
+/* Exact fixed columns: label | : | amount */
+.billTotals .billTotalLine,
+.forceDesktopBill .billTotals .billTotalLine,
+.billTotals .billTransportLine,
+.forceDesktopBill .billTotals .billTransportLine {
+  display: grid !important;
+  grid-template-columns: 410px 18px 120px !important;
+  column-gap: 6px !important;
+  align-items: center !important;
+  width: 560px !important;
+}
+
+.billTotals .billTotalLabel,
+.billTotals .billTransportLine .billTotalLabel,
+.forceDesktopBill .billTotals .billTotalLabel,
+.forceDesktopBill .billTotals .billTransportLine .billTotalLabel {
+  grid-column: 1 !important;
+  text-align: right !important;
+  justify-self: end !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+}
+
+/* Transport remains one line */
+.billTotals .billTransportLine .billTotalLabel,
+.forceDesktopBill .billTotals .billTransportLine .billTotalLabel {
+  white-space: nowrap !important;
+  font-size: 13px !important;
+}
+
+/* All colons exactly aligned */
+.billTotals .billTotalColon,
+.billTotals .billTransportLine .billTotalColon,
+.forceDesktopBill .billTotals .billTotalColon,
+.forceDesktopBill .billTotals .billTransportLine .billTotalColon {
+  grid-column: 2 !important;
+  width: 18px !important;
+  text-align: center !important;
+  justify-self: center !important;
+  display: block !important;
+}
+
+/* All amounts end at same right edge */
+.billTotals .billTotalLine > b,
+.billTotals .billTransportLine > b,
+.forceDesktopBill .billTotals .billTotalLine > b,
+.forceDesktopBill .billTotals .billTransportLine > b {
+  grid-column: 3 !important;
+  width: 120px !important;
+  text-align: right !important;
+  justify-self: end !important;
+  white-space: nowrap !important;
+}
+
+/* Final payable line: heading centered inside red area, amount at far right */
+.billPayableLine,
+.forceDesktopBill .billPayableLine {
+  position: relative !important;
+  display: block !important;
+  width: 560px !important;
+  min-height: 58px !important;
+  box-sizing: border-box !important;
+  margin-top: 14px !important;
+  padding: 10px 16px !important;
+  border-top: 2px solid #d40000 !important;
+}
+
+.billPayableLine .billTotalLabel,
+.forceDesktopBill .billPayableLine .billTotalLabel {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.billPayableLine .billTotalColon,
+.forceDesktopBill .billPayableLine .billTotalColon {
+  display: none !important;
+}
+
+.billPayableLine > b,
+.forceDesktopBill .billPayableLine > b {
+  position: absolute !important;
+  right: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: auto !important;
+  margin: 0 !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+
+/* Footer full width; QR sits immediately above it */
+.billCreated,
+.forceDesktopBill .billCreated {
+  margin-top: 6px !important;
+  padding-top: 6px !important;
+  padding-right: 0 !important;
+  border-top: 1px solid #d1d5db !important;
+}
+
+/* Bottom three lines closer together */
+.billTagline,
+.forceDesktopBill .billTagline {
+  margin: 0 0 2px 0 !important;
+  line-height: 1.15 !important;
+}
+
+.billCreatedText,
+.forceDesktopBill .billCreatedText {
+  margin: 0 !important;
+  line-height: 1.15 !important;
+}
+
+.billCopyright,
+.forceDesktopBill .billCopyright {
+  margin-top: 2px !important;
+  padding-top: 0 !important;
+  border: 0 !important;
+  line-height: 1.15 !important;
+}
