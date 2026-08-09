@@ -748,9 +748,15 @@ export default function Home() {
     });
   }, [rows]);
 
-  const activeRows = calculatedRows.filter(
-    (row) => row.tool || row.qty || row.rent || row.from || row.to
-  );
+  const activeRows = calculatedRows
+    .filter((row) => row.tool || row.qty || row.rent || row.from || row.to)
+    .map((row, index) => ({ ...row, originalIndex: index }))
+    .sort((a, b) => {
+      if (!a.from && !b.from) return a.originalIndex - b.originalIndex;
+      if (!a.from) return 1;
+      if (!b.from) return -1;
+      return a.from.localeCompare(b.from) || a.originalIndex - b.originalIndex;
+    });
 
   const totalQty = calculatedRows.reduce(
     (sum, row) => sum + Number(row.qty || 0),
@@ -760,19 +766,35 @@ export default function Home() {
   const grandTotal = calculatedRows.reduce((sum, row) => sum + row.amount, 0);
   const openingBalanceAmount = Math.max(Number(openingBalance || 0), 0);
   const rentWithOpeningBalance = openingBalanceAmount + grandTotal;
-  const activeTransports = transports.filter(
-    (transport) =>
-      transport.date || transport.place || Number(transport.amount || 0) > 0
-  );
+  const activeTransports = transports
+    .map((transport, index) => ({ ...transport, originalIndex: index }))
+    .filter(
+      (transport) =>
+        transport.date || transport.place || Number(transport.amount || 0) > 0
+    )
+    .sort((a, b) => {
+      if (!a.date && !b.date) return a.originalIndex - b.originalIndex;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return a.date.localeCompare(b.date) || a.originalIndex - b.originalIndex;
+    });
   const transportAmount = transports.reduce(
     (sum, transport) => sum + Math.max(Number(transport.amount || 0), 0),
     0
   );
   const discountAmount = Math.max(Number(discount || 0), 0);
   const advanceAmount = Math.max(Number(advance || 0), 0);
-  const activePayments = payments.filter(
-    (payment) => payment.date || Number(payment.amount || 0) > 0 || payment.note
-  );
+  const activePayments = payments
+    .map((payment, index) => ({ ...payment, originalIndex: index }))
+    .filter(
+      (payment) => payment.date || Number(payment.amount || 0) > 0 || payment.note
+    )
+    .sort((a, b) => {
+      if (!a.date && !b.date) return a.originalIndex - b.originalIndex;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return a.date.localeCompare(b.date) || a.originalIndex - b.originalIndex;
+    });
   const totalPayments = payments.reduce(
     (sum, payment) => sum + Math.max(Number(payment.amount || 0), 0),
     0
@@ -786,6 +808,20 @@ export default function Home() {
       totalPayments,
     0
   );
+
+  let runningBillBalance = openingBalanceAmount - advanceAmount;
+  const rentalBalances = activeRows.map((row) => {
+    runningBillBalance += row.amount;
+    return runningBillBalance;
+  });
+  const transportBalances = activeTransports.map((transport) => {
+    runningBillBalance += Math.max(Number(transport.amount || 0), 0);
+    return runningBillBalance;
+  });
+  const paymentBalances = activePayments.map((payment) => {
+    runningBillBalance -= Math.max(Number(payment.amount || 0), 0);
+    return runningBillBalance;
+  });
 
   async function refreshDrafts() {
     const savedDrafts = await getAllSavedDrafts();
@@ -1819,12 +1855,13 @@ ${openingBalanceLine}${lines.join("\n")}
               <th>വരെ</th>
               <th>ദിവസം</th>
               <th>തുക</th>
+              <th>ബാലൻസ്</th>
             </tr>
           </thead>
 
           <tbody>
             {openingBalanceAmount > 0 && (
-              <tr>
+              <tr className="billOpeningBalanceRow">
                 <td>1</td>
                 <td style={{ fontWeight: 900 }}>മുൻ ബാലൻസ്</td>
                 <td>—</td>
@@ -1833,12 +1870,34 @@ ${openingBalanceLine}${lines.join("\n")}
                 <td>—</td>
                 <td>—</td>
                 <td style={{ fontWeight: 900 }}>₹ {formatMoney(openingBalanceAmount)}</td>
+                <td style={{ fontWeight: 900 }}>₹ {formatMoney(openingBalanceAmount)}</td>
+              </tr>
+            )}
+
+            {advanceAmount > 0 && (
+              <tr className="billTransactionRow">
+                <td>{openingBalanceAmount > 0 ? 2 : 1}</td>
+                <td style={{ fontWeight: 900 }}>അഡ്വാൻസ്</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td className="billDeductionAmount">− ₹ {formatMoney(advanceAmount)}</td>
+                <td style={{ fontWeight: 900 }}>
+                  ₹ {formatMoney(openingBalanceAmount - advanceAmount)}
+                </td>
               </tr>
             )}
 
             {activeRows.map((row, index) => (
-              <tr key={index}>
-                <td>{index + 1 + (openingBalanceAmount > 0 ? 1 : 0)}</td>
+              <tr key={row.originalIndex}>
+                <td>
+                  {index +
+                    1 +
+                    (openingBalanceAmount > 0 ? 1 : 0) +
+                    (advanceAmount > 0 ? 1 : 0)}
+                </td>
                 <td>{row.tool || "-"}</td>
                 <td>{row.qty || "-"}</td>
                 <td>₹ {row.rent || "-"}</td>
@@ -1854,19 +1913,80 @@ ${openingBalanceLine}${lines.join("\n")}
                 </td>
                 <td>{row.days}</td>
                 <td>₹ {formatMoney(row.amount)}</td>
+                <td>₹ {formatMoney(rentalBalances[index])}</td>
               </tr>
             ))}
 
-            <tr className="billTotalRow">
-              <td colSpan={7} style={{ textAlign: "center", fontWeight: 900 }}>
-                {openingBalanceAmount > 0
-                  ? "മുൻ ബാലൻസ് + ടൂൾസ് വാടക"
-                  : "ടൂൾസ് വാടക"}
-              </td>
-              <td style={{ fontWeight: 900 }}>
-                ₹ {formatMoney(rentWithOpeningBalance)}
-              </td>
-            </tr>
+            {activeTransports.map((transport, index) => {
+              const amount = Math.max(Number(transport.amount || 0), 0);
+              if (amount <= 0) return null;
+
+              return (
+                <tr className="billTransactionRow" key={`transport-${transport.originalIndex}`}>
+                  <td>
+                    {index +
+                      1 +
+                      (openingBalanceAmount > 0 ? 1 : 0) +
+                      (advanceAmount > 0 ? 1 : 0) +
+                      activeRows.length}
+                  </td>
+                  <td style={{ fontWeight: 900 }}>
+                    ഗതാഗത ചെലവ്{transport.place.trim() ? ` - ${transport.place.trim()}` : ""}
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>
+                    {transport.date || "—"}
+                    {transport.date && (
+                      <>
+                        <br />
+                        <small>{formatDate(transport.date)}</small>
+                      </>
+                    )}
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>₹ {formatMoney(amount)}</td>
+                  <td>₹ {formatMoney(transportBalances[index])}</td>
+                </tr>
+              );
+            })}
+
+            {activePayments.map((payment, index) => {
+              const amount = Math.max(Number(payment.amount || 0), 0);
+              if (amount <= 0) return null;
+
+              return (
+                <tr className="billTransactionRow billCashReceivedRow" key={`payment-${payment.originalIndex}`}>
+                  <td>
+                    {index +
+                      1 +
+                      (openingBalanceAmount > 0 ? 1 : 0) +
+                      (advanceAmount > 0 ? 1 : 0) +
+                      activeRows.length +
+                      activeTransports.filter((item) => Number(item.amount || 0) > 0).length}
+                  </td>
+                  <td style={{ fontWeight: 900 }}>
+                    വരവ്{payment.note.trim() ? ` - ${payment.note.trim()}` : ""}
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>
+                    {payment.date || "—"}
+                    {payment.date && (
+                      <>
+                        <br />
+                        <small>{formatDate(payment.date)}</small>
+                      </>
+                    )}
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td className="billDeductionAmount">− ₹ {formatMoney(amount)}</td>
+                  <td>₹ {formatMoney(paymentBalances[index])}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
@@ -1899,58 +2019,6 @@ ${openingBalanceLine}${lines.join("\n")}
                 <b>− ₹ {formatMoney(discountAmount)}</b>
               </div>
             )}
-
-            {advanceAmount > 0 && (
-              <div className="billTotalLine">
-                <span className="billTotalLabel">അഡ്വാൻസ്</span>
-                <span className="billTotalColon">:</span>
-                <b>− ₹ {formatMoney(advanceAmount)}</b>
-              </div>
-            )}
-
-            {activePayments.map((payment, index) => {
-              const amount = Math.max(Number(payment.amount || 0), 0);
-              if (amount <= 0) return null;
-
-              const dateLabel = payment.date
-                ? new Date(payment.date + "T00:00:00").toLocaleDateString("en-IN")
-                : "-";
-              const noteLabel = payment.note.trim()
-                ? ` - ${payment.note.trim()}`
-                : "";
-
-              return (
-                <div className="billTotalLine" key={`${payment.date}-${index}`}>
-                  <span className="billTotalLabel">
-                    വരവ് ({dateLabel}){noteLabel}
-                  </span>
-                  <span className="billTotalColon">:</span>
-                  <b>− ₹ {formatMoney(amount)}</b>
-                </div>
-              );
-            })}
-
-            {activeTransports.map((transport, index) => {
-              const amount = Math.max(Number(transport.amount || 0), 0);
-              if (amount <= 0) return null;
-
-              const dateLabel = transport.date
-                ? new Date(transport.date + "T00:00:00").toLocaleDateString("en-IN")
-                : "-";
-              const placeLabel = transport.place.trim()
-                ? ` - ${transport.place.trim()}`
-                : "";
-
-              return (
-                <div className="billTotalLine billTransportLine" key={`${transport.date}-${transport.place}-${index}`}>
-                  <span className="billTotalLabel">
-                    ഗതാഗത ചെലവ് ({dateLabel}){placeLabel}
-                  </span>
-                  <span className="billTotalColon">:</span>
-                  <b>₹ {formatMoney(amount)}</b>
-                </div>
-              );
-            })}
 
             <div className="billTotalLine billPayableLine">
               <span className="billTotalLabel">മൊത്തം അടക്കാനുള്ളത്</span>

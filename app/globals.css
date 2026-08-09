@@ -2000,3 +2000,112 @@ td input:focus {
   border: 0 !important;
   line-height: 1.15 !important;
 }
+
+/* Calculator detail rows: compact table with running balance. */
+.billTable .billTransactionRow td {
+  background: #ffffff !important;
+}
+
+.billTable .billDeductionAmount {
+  color: #b91c1c !important;
+  font-weight: 900 !important;
+}
+
+.billTable th,
+.billTable td {
+  padding: 8px 5px !important;
+  font-size: 16px !important;
+}
+
+.billTable td:nth-child(2) {
+  font-size: 17px !important;
+  padding-left: 8px !important;
+}
+
+.billTable th:nth-child(1),
+.billTable td:nth-child(1) {
+  width: 36px !important;
+}
+
+.billTable th:nth-child(2),
+.billTable td:nth-child(2) {
+  width: 24% !important;
+}
+
+.billTable th:nth-child(3),
+.billTable td:nth-child(3) {
+  width: 54px !important;
+}
+
+.billTable th:nth-child(4),
+.billTable td:nth-child(4) {
+  width: 88px !important;
+}
+
+.billTable th:nth-child(5),
+.billTable td:nth-child(5),
+.billTable th:nth-child(6),
+.billTable td:nth-child(6) {
+  width: 112px !important;
+}
+
+.billTable th:nth-child(7),
+.billTable td:nth-child(7) {
+  width: 58px !important;
+}
+
+.billTable th:nth-child(8),
+.billTable td:nth-child(8),
+.billTable th:nth-child(9),
+.billTable td:nth-child(9) {
+  width: 94px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.billTable .billOpeningBalanceRow td:nth-child(2),
+.billTable .billOpeningBalanceRow td:nth-child(8),
+.billTable .billOpeningBalanceRow td:nth-child(9) {
+  color: #d40000 !important;
+}
+
+.billTable .billCashReceivedRow td:nth-child(2),
+.billTable .billCashReceivedRow td:nth-child(8) {
+  color: #07883b !important;
+}
+
+/* Stable in both the live preview and html2canvas JPG output. */
+.billTotals .billPayableLine,
+.forceDesktopBill .billTotals .billPayableLine {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr) 120px !important;
+  column-gap: 0 !important;
+  width: 560px !important;
+  min-height: 58px !important;
+  box-sizing: border-box !important;
+  align-items: center !important;
+}
+
+.billTotals .billPayableLine .billTotalLabel,
+.forceDesktopBill .billTotals .billPayableLine .billTotalLabel {
+  position: static !important;
+  grid-column: 2 !important;
+  transform: none !important;
+  justify-self: center !important;
+  width: auto !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.billTotals .billPayableLine > b,
+.forceDesktopBill .billTotals .billPayableLine > b {
+  position: static !important;
+  grid-column: 3 !important;
+  transform: none !important;
+  justify-self: end !important;
+  width: auto !important;
+  margin-right: 16px !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+}
