@@ -25,6 +25,11 @@ type TransportRow = {
   amount: string;
 };
 
+type HolidayRow = {
+  date: string;
+  name: string;
+};
+
 const branches = [
   {
     name: "KARUVANNUR",
@@ -82,6 +87,14 @@ const emptyTransportRow = (): TransportRow => ({
 
 const createTransportRows = (count: number) =>
   Array.from({ length: count }, () => emptyTransportRow());
+
+const emptyHolidayRow = (): HolidayRow => ({
+  date: "",
+  name: "",
+});
+
+const createHolidayRows = (count: number) =>
+  Array.from({ length: count }, () => emptyHolidayRow());
 
 function rowHasData(row: Row) {
   return Boolean(row.tool || row.qty || row.rent || row.from || row.to);
@@ -149,7 +162,12 @@ function countSundays(from: Date, to: Date) {
   return count;
 }
 
-function getDays(from: string, to: string, sundayOff: boolean) {
+function getDays(
+  from: string,
+  to: string,
+  sundayOff: boolean,
+  holidays: HolidayRow[]
+) {
   if (!from || !to) return 0;
 
   const start = new Date(from + "T00:00:00");
@@ -160,9 +178,22 @@ function getDays(from: string, to: string, sundayOff: boolean) {
   const totalDays =
     Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-  return sundayOff
-    ? Math.max(totalDays - countSundays(start, end), 0)
-    : totalDays;
+  const holidayDates = new Set(
+    holidays
+      .map((holiday) => holiday.date)
+      .filter((date) => {
+        if (!date) return false;
+        const holidayDate = new Date(date + "T00:00:00");
+        return (
+          holidayDate >= start &&
+          holidayDate <= end &&
+          !(sundayOff && holidayDate.getDay() === 0)
+        );
+      })
+  );
+
+  const excludedSundays = sundayOff ? countSundays(start, end) : 0;
+  return Math.max(totalDays - excludedSundays - holidayDates.size, 0);
 }
 
 function formatMoney(value: number) {
@@ -252,6 +283,19 @@ function normalizeCalculationData(value: unknown): CalculationData | null {
       ? [{ date: "", place: "", amount: String(record.transportCost) }]
       : createTransportRows(1);
 
+  const holidays: HolidayRow[] = Array.isArray(record.holidays)
+    ? record.holidays.map((item) => {
+        const holiday = item && typeof item === "object"
+          ? (item as Record<string, unknown>)
+          : {};
+
+        return {
+          date: String(holiday.date ?? ""),
+          name: String(holiday.name ?? ""),
+        };
+      })
+    : createHolidayRows(1);
+
   return {
     customerName: String(record.customerName ?? ""),
     openingBalance: String(record.openingBalance ?? ""),
@@ -259,6 +303,7 @@ function normalizeCalculationData(value: unknown): CalculationData | null {
     discount: String(record.discount ?? ""),
     advance: String(record.advance ?? ""),
     payments: payments.length > 0 ? payments : createPaymentRows(1),
+    holidays: holidays.length > 0 ? holidays : createHolidayRows(1),
     rows: rows.length > 0 ? rows : createRows(10),
   };
 }
@@ -272,6 +317,7 @@ type CalculationData = {
   discount: string;
   advance: string;
   payments: PaymentRow[];
+  holidays: HolidayRow[];
   rows: Row[];
 };
 
@@ -291,6 +337,7 @@ type SavedDraft = {
   discount: string;
   advance?: string;
   payments?: PaymentRow[];
+  holidays?: HolidayRow[];
   rows: Row[];
   updatedAt: number;
 };
@@ -377,7 +424,8 @@ function hasUsefulData(
   transports: TransportRow[],
   discount: string,
   advance: string,
-  payments: PaymentRow[]
+  payments: PaymentRow[],
+  holidays: HolidayRow[]
 ) {
   return Boolean(
     customerName.trim() ||
@@ -386,6 +434,7 @@ function hasUsefulData(
       discount.trim() ||
       advance.trim() ||
       payments.some((payment) => payment.date || payment.amount || payment.note) ||
+      holidays.some((holiday) => holiday.date || holiday.name) ||
       rows.some((row) => row.tool || row.qty || row.rent || row.from || row.to)
   );
 }
@@ -397,6 +446,7 @@ export default function Home() {
   const [discount, setDiscount] = useState("");
   const [advance, setAdvance] = useState("");
   const [payments, setPayments] = useState<PaymentRow[]>(createPaymentRows(1));
+  const [holidays, setHolidays] = useState<HolidayRow[]>(createHolidayRows(1));
   const [rows, setRows] = useState<Row[]>(createRows(10));
   const [drafts, setDrafts] = useState<SavedDraft[]>([]);
   const [draftSearch, setDraftSearch] = useState("");
@@ -424,6 +474,7 @@ export default function Home() {
       discount,
       advance,
       payments,
+      holidays,
       rows,
     }),
     [
@@ -433,6 +484,7 @@ export default function Home() {
       discount,
       advance,
       payments,
+      holidays,
       rows,
     ]
   );
@@ -449,7 +501,8 @@ export default function Home() {
     transports,
     discount,
     advance,
-    payments
+    payments,
+    holidays
   );
 
   const hasUnsavedFileChanges =
@@ -471,6 +524,25 @@ export default function Home() {
 
   function addTransportRow() {
     setTransports((current) => [...current, emptyTransportRow()]);
+  }
+
+  function addHolidayRow() {
+    setHolidays((current) => [...current, emptyHolidayRow()]);
+  }
+
+  function updateHolidayRow(index: number, field: keyof HolidayRow, value: string) {
+    setHolidays((current) =>
+      current.map((holiday, holidayIndex) =>
+        holidayIndex === index ? { ...holiday, [field]: value } : holiday
+      )
+    );
+  }
+
+  function removeHolidayRow(index: number) {
+    setHolidays((current) => {
+      const updated = current.filter((_, holidayIndex) => holidayIndex !== index);
+      return updated.length > 0 ? updated : createHolidayRows(1);
+    });
   }
 
   function updateTransportRow(
@@ -710,6 +782,7 @@ export default function Home() {
       setDiscount(data.discount);
       setAdvance(data.advance);
       setPayments(data.payments);
+      setHolidays(data.holidays);
       setRows(data.rows);
       setLastFileSavedSnapshot(JSON.stringify(data));
       setFileSaveStatus(`✓ Opened: ${file.name}`);
@@ -734,6 +807,7 @@ export default function Home() {
       setDiscount("");
       setAdvance("");
       setPayments(createPaymentRows(1));
+      setHolidays(createHolidayRows(1));
       setLastFileSavedSnapshot("");
       setFileSaveStatus("Bill file not saved");
       setSaveStatus("New calculation");
@@ -742,11 +816,11 @@ export default function Home() {
 
   const calculatedRows = useMemo(() => {
     return rows.map((row) => {
-      const days = getDays(row.from, row.to, row.sundayOff);
+      const days = getDays(row.from, row.to, row.sundayOff, holidays);
       const amount = Number(row.qty || 0) * Number(row.rent || 0) * days;
       return { ...row, days, amount };
     });
-  }, [rows]);
+  }, [rows, holidays]);
 
   const activeRows = calculatedRows
     .filter((row) => row.tool || row.qty || row.rent || row.from || row.to)
@@ -757,6 +831,13 @@ export default function Home() {
       if (!b.from) return -1;
       return a.from.localeCompare(b.from) || a.originalIndex - b.originalIndex;
     });
+
+  const activeHolidays = holidays
+    .map((holiday, index) => ({ ...holiday, originalIndex: index }))
+    .filter((holiday) => holiday.date)
+    .sort((a, b) =>
+      a.date.localeCompare(b.date) || a.originalIndex - b.originalIndex
+    );
 
   const totalQty = calculatedRows.reduce(
     (sum, row) => sum + Number(row.qty || 0),
@@ -847,6 +928,11 @@ export default function Home() {
         ? draft.payments
         : createPaymentRows(1)
     );
+    setHolidays(
+      draft.holidays && draft.holidays.length > 0
+        ? draft.holidays
+        : createHolidayRows(1)
+    );
     setRows(draft.rows && draft.rows.length > 0 ? draft.rows : createRows(10));
     setLastFileSavedSnapshot("");
     setFileSaveStatus("Draft opened — save as file");
@@ -885,7 +971,8 @@ export default function Home() {
                 : createTransportRows(1),
             currentDraft.discount,
             currentDraft.advance || "",
-            currentDraft.payments || []
+            currentDraft.payments || [],
+            currentDraft.holidays || []
           ) &&
           confirm("Previous calculation found. Continue?")
         ) {
@@ -904,6 +991,11 @@ export default function Home() {
             currentDraft.payments && currentDraft.payments.length > 0
               ? currentDraft.payments
               : createPaymentRows(1)
+          );
+          setHolidays(
+            currentDraft.holidays && currentDraft.holidays.length > 0
+              ? currentDraft.holidays
+              : createHolidayRows(1)
           );
           setRows(currentDraft.rows && currentDraft.rows.length > 0 ? currentDraft.rows : createRows(10));
           setSaveStatus("Previous calculation restored");
@@ -930,7 +1022,8 @@ export default function Home() {
           transports,
           discount,
           advance,
-          payments
+          payments,
+          holidays
         );
         const now = Date.now();
 
@@ -942,6 +1035,7 @@ export default function Home() {
           discount,
           advance,
           payments,
+          holidays,
           rows,
           updatedAt: now,
         });
@@ -955,6 +1049,7 @@ export default function Home() {
             discount,
             advance,
             payments,
+            holidays,
             rows,
             updatedAt: now,
           });
@@ -976,6 +1071,7 @@ export default function Home() {
     discount,
     advance,
     payments,
+    holidays,
     rows,
     loadedFromDb,
   ]);
@@ -1048,11 +1144,20 @@ export default function Home() {
       .filter(Boolean)
       .join("");
 
+    const holidayLines = activeHolidays.length > 0
+      ? `\n\nഅവധി ദിവസങ്ങളായതിനാൽ താഴെപ്പറയുന്ന ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല:\n${activeHolidays
+          .map(
+            (holiday) =>
+              `• ${new Date(holiday.date + "T00:00:00").toLocaleDateString("en-IN")} - ${holiday.name.trim() || "അവധി"}`
+          )
+          .join("\n")}`
+      : "";
+
     return `Tried & True Rental Calculator
 
 ഉപഭോക്താവിന്റെ പേര്: ${customerName || "-"}
 
-${openingBalanceLine}${lines.join("\n")}
+${openingBalanceLine}${lines.join("\n")}${holidayLines}
 
 ടൂൾസ് വാടക: ₹${formatMoney(
       grandTotal
@@ -1453,6 +1558,51 @@ ${openingBalanceLine}${lines.join("\n")}
                 </tbody>
               </table>
             </div>
+          </section>
+
+          <section className="holidayEntryBox">
+            <div className="holidayEntryTitle">🎉 വാടക ഈടാക്കാത്ത അവധി ദിവസങ്ങൾ</div>
+            <div className="holidayEntryHead">
+              <span>തീയതി</span>
+              <span>അവധിയുടെ പേര്</span>
+              <span></span>
+            </div>
+            {holidays.map((holiday, index) => (
+              <div className="holidayEntryRow" key={index}>
+                <input
+                  type="date"
+                  value={holiday.date}
+                  onChange={(event) =>
+                    updateHolidayRow(index, "date", event.target.value)
+                  }
+                  aria-label="Holiday date"
+                />
+                <input
+                  type="text"
+                  value={holiday.name}
+                  onChange={(event) =>
+                    updateHolidayRow(index, "name", event.target.value)
+                  }
+                  placeholder="ഉദാ: ഓണം / വിഷു"
+                  aria-label="Holiday name"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeHolidayRow(index)}
+                  title="Remove holiday"
+                  aria-label="Remove holiday"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="addHolidayBtn"
+              onClick={addHolidayRow}
+            >
+              ➕ മറ്റൊരു അവധി ദിവസം ചേർക്കുക
+            </button>
           </section>
 
           <section
@@ -1989,6 +2139,18 @@ ${openingBalanceLine}${lines.join("\n")}
             })}
           </tbody>
         </table>
+
+        {activeHolidays.length > 0 && (
+          <div className="billHolidayNote">
+            <strong>അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല:</strong>
+            {activeHolidays.map((holiday) => (
+              <span key={`${holiday.date}-${holiday.originalIndex}`}>
+                {new Date(holiday.date + "T00:00:00").toLocaleDateString("en-IN")}
+                {` - ${holiday.name.trim() || "അവധി"}`}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="billBottom">
           <div className="paymentCard">
