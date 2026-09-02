@@ -2202,9 +2202,17 @@ td input:focus {
 }
 
 .billHolidayNote .billSundayExcluded {
-  margin: 0 0 5px;
+  display: block;
+  margin: 4px 0 0;
   color: #7a5300;
   font-size: 10px;
   font-weight: 700;
   line-height: 1.2;
+}
+
+.billHolidayLine {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+  white-space: nowrap;
 }

@@ -2154,18 +2154,19 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
 
         {(hasSundayExclusions || activeHolidays.length > 0) && (
           <div className="billHolidayNote">
-            {hasSundayExclusions && (
-              <span className="billSundayExcluded">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</span>
-            )}
             {activeHolidays.length > 0 && (
-              <strong>അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല:</strong>
+              <div className="billHolidayLine">
+                {`അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല: ${activeHolidays
+                  .map(
+                    (holiday) =>
+                      `${new Date(holiday.date + "T00:00:00").toLocaleDateString("en-IN")} - ${holiday.name.trim() || "അവധി"}`
+                  )
+                  .join(", ")}`}
+              </div>
             )}
-            {activeHolidays.map((holiday) => (
-              <span key={`${holiday.date}-${holiday.originalIndex}`}>
-                {new Date(holiday.date + "T00:00:00").toLocaleDateString("en-IN")}
-                {` - ${holiday.name.trim() || "അവധി"}`}
-              </span>
-            ))}
+            {hasSundayExclusions && (
+              <small className="billSundayExcluded">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</small>
+            )}
           </div>
         )}
 
