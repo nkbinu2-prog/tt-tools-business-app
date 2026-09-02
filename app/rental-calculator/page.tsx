@@ -847,6 +847,10 @@ export default function Home() {
       a.date.localeCompare(b.date) || a.originalIndex - b.originalIndex
     );
 
+  const hasSundayExclusions = activeRows.some((row) =>
+    hasExcludedSunday(row.from, row.to, row.sundayOff)
+  );
+
   const totalQty = calculatedRows.reduce(
     (sum, row) => sum + Number(row.qty || 0),
     0
@@ -1102,7 +1106,7 @@ export default function Home() {
         row.qty || 0
       } | Rent: ₹${row.rent || 0} | Days: ${row.days} | ₹${formatMoney(
         row.amount
-      )}${hasExcludedSunday(row.from, row.to, row.sundayOff) ? " | ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല" : ""}`;
+      )}`;
     });
 
     const openingBalanceLine =
@@ -1545,12 +1549,7 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
                         <div className="dateShow">{formatDate(row.to)}</div>
                       </td>
 
-                      <td className="daysCell">
-                        {row.days}
-                        {hasExcludedSunday(row.from, row.to, row.sundayOff) && (
-                          <small className="sundayExcludedText">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</small>
-                        )}
-                      </td>
+                      <td className="daysCell">{row.days}</td>
                       <td className="amountCell">{formatMoney(row.amount)}</td>
 
                     </tr>
@@ -2074,12 +2073,7 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
                   <br />
                   <small>{formatDate(row.to)}</small>
                 </td>
-                <td>
-                  {row.days}
-                  {hasExcludedSunday(row.from, row.to, row.sundayOff) && (
-                    <small className="sundayExcludedText">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</small>
-                  )}
-                </td>
+                <td>{row.days}</td>
                 <td>₹ {formatMoney(row.amount)}</td>
                 <td>₹ {formatMoney(rentalBalances[index])}</td>
               </tr>
@@ -2158,9 +2152,14 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
           </tbody>
         </table>
 
-        {activeHolidays.length > 0 && (
+        {(hasSundayExclusions || activeHolidays.length > 0) && (
           <div className="billHolidayNote">
-            <strong>അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല:</strong>
+            {hasSundayExclusions && (
+              <span className="billSundayExcluded">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</span>
+            )}
+            {activeHolidays.length > 0 && (
+              <strong>അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല:</strong>
+            )}
             {activeHolidays.map((holiday) => (
               <span key={`${holiday.date}-${holiday.originalIndex}`}>
                 {new Date(holiday.date + "T00:00:00").toLocaleDateString("en-IN")}
