@@ -162,6 +162,14 @@ function countSundays(from: Date, to: Date) {
   return count;
 }
 
+function hasExcludedSunday(from: string, to: string, sundayOff: boolean) {
+  if (!sundayOff || !from || !to) return false;
+
+  const start = new Date(from + "T00:00:00");
+  const end = new Date(to + "T00:00:00");
+  return end >= start && countSundays(start, end) > 0;
+}
+
 function getDays(
   from: string,
   to: string,
@@ -1094,7 +1102,7 @@ export default function Home() {
         row.qty || 0
       } | Rent: ₹${row.rent || 0} | Days: ${row.days} | ₹${formatMoney(
         row.amount
-      )}`;
+      )}${hasExcludedSunday(row.from, row.to, row.sundayOff) ? " | ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല" : ""}`;
     });
 
     const openingBalanceLine =
@@ -1537,7 +1545,12 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
                         <div className="dateShow">{formatDate(row.to)}</div>
                       </td>
 
-                      <td className="daysCell">{row.days}</td>
+                      <td className="daysCell">
+                        {row.days}
+                        {hasExcludedSunday(row.from, row.to, row.sundayOff) && (
+                          <small className="sundayExcludedText">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</small>
+                        )}
+                      </td>
                       <td className="amountCell">{formatMoney(row.amount)}</td>
 
                     </tr>
@@ -2061,7 +2074,12 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
                   <br />
                   <small>{formatDate(row.to)}</small>
                 </td>
-                <td>{row.days}</td>
+                <td>
+                  {row.days}
+                  {hasExcludedSunday(row.from, row.to, row.sundayOff) && (
+                    <small className="sundayExcludedText">ഞായർ ഉൾപ്പെടുത്തിയിട്ടില്ല</small>
+                  )}
+                </td>
                 <td>₹ {formatMoney(row.amount)}</td>
                 <td>₹ {formatMoney(rentalBalances[index])}</td>
               </tr>
