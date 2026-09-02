@@ -2017,7 +2017,11 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
               <th>വരെ</th>
               <th>ദിവസം</th>
               <th>തുക</th>
-              <th>ബാലൻസ്</th>
+              <th>
+                റണ്ണിങ്
+                <br />
+                ടോട്ടൽ
+              </th>
             </tr>
           </thead>
 
