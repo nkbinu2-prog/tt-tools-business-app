@@ -2156,7 +2156,9 @@ ${openingBalanceLine}${lines.join("\n")}${holidayLines}
           <div className="billHolidayNote">
             {activeHolidays.length > 0 && (
               <div className="billHolidayLine">
-                {`അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല: ${activeHolidays
+                {`${activeHolidays.length === 1
+                  ? "അവധി ദിവസമായതിനാൽ ഈ ദിവസത്തിന് വാടക ഈടാക്കിയിട്ടില്ല:"
+                  : "അവധി ദിവസങ്ങളായതിനാൽ ഈ ദിവസങ്ങൾക്ക് വാടക ഈടാക്കിയിട്ടില്ല:"} ${activeHolidays
                   .map(
                     (holiday) =>
                       `${new Date(holiday.date + "T00:00:00").toLocaleDateString("en-IN")} - ${holiday.name.trim() || "അവധി"}`
